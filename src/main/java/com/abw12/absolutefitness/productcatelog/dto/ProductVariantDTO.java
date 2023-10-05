@@ -15,7 +15,7 @@ public class ProductVariantDTO {
     private String productId;
     private String productVariantDesc;
     private String sku;
-    private String volumn;
+    private String volume;
     private String imagePath;
     private Double price;
     private  String productFlavour;
