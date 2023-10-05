@@ -1,0 +1,18 @@
+#spring:
+#  data:
+#    mongodb:
+#      database: AbsoluteFitness
+#      host: localhost
+#      port: 27017
+#server:
+#  port: 8090
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/productcatalog
+    username: postgres
+    password: password
+server:
+  port: 8090
+springdoc:
+  api-docs:
+    path: /v3/productcatalog-docs
