@@ -4,21 +4,29 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductVariantDTO {
 
-    private int id;
-    private String productId;
-    private String productVariantDesc;
+    private Long variantId;
+    private String variantName;
+    private String variantValue;
     private String sku;
-    private String volume;
     private String imagePath;
-    private Double price;
-    private  String productFlavour;
-    private Date createdDate;
-    private Date modifiedDate;
+    private Double buyPrice;
+    private Double onSalePrice;
+    private String about;
+    private String benefits;
+    private String nutritionFacts;
+    private String usageDose;
+    private String manufacturerDetails;
+    //    @JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "dd-MM-yyyy")
+    private OffsetDateTime expiryDate;
+    //    @JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "dd-MM-yyyy")
+    private OffsetDateTime mfdDate;
+    private OffsetDateTime variantCreatedAt;
+    private OffsetDateTime variantModifiedAt;
 }

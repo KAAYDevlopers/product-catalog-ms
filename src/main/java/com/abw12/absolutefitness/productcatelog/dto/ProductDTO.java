@@ -6,25 +6,23 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductDTO {
-//    private String id;
     private Long productId;
     @NotBlank
     private String productName;
+    private String productDescription;
+    private Long categoryId;
     @NotBlank
-    private String brand;
+    private String brandName;
     @NotNull
-    private List<ProductCatagoryDTO> productCatagory;
+    private ProductCategoryDTO productCategory;
     private List<ProductVariantDTO> productVariants;
-    private ProductDescriptionDTO productDescription;
-    private List<ProductDiscountsDTO> productDiscounts;
-    private ProductInventoryDTO inventoryInfo;
-    private Date createdDate;
-    private Date modifiedDate;
+    private OffsetDateTime productCreatedAt;
+    private OffsetDateTime productModifiedAt;
 }

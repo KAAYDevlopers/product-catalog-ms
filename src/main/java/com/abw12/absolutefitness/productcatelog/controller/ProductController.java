@@ -48,40 +48,17 @@ public class ProductController {
     public ResponseEntity<?> getProductByCategoryID(@PathVariable Long categoryID){
         logger.info("Inside getProductByCategoryID rest call: {} " , categoryID);
         try{
-            return  new ResponseEntity<>(productService.getProductByCategoryId(categoryID),HttpStatus.OK);
+            return  new ResponseEntity<>(productService.getProductsByCategoryId(categoryID),HttpStatus.OK);
         }catch(Exception e){
             logger.error("Exception while fetching the product by catLogId : {} :: Error Message= {}",categoryID,e.getMessage());
             return new ResponseEntity<>("Could not fetch product with categoryID!",HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @GetMapping("/getProductByCatLogID/{categoryName}")
-    public ResponseEntity<?> getProductByCategoryName(@PathVariable String categoryName){
-        logger.info("Inside getProductByCategoryName rest call: {} " , categoryName);
-        try{
-            return  new ResponseEntity<>(productService.getProductByCategoryName(categoryName),HttpStatus.OK);
-        }catch(Exception e){
-            logger.error("Exception while fetching the product by categoryName : {} :: Error Message= {}",categoryName,e.getMessage());
-            return new ResponseEntity<>("Could not fetch product with categoryName!",HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping("/getAllProducts")
-    public ResponseEntity<?> getAllProducts(){
-        logger.info("Inside getAllProducts rest call");
-        try{
-            return new ResponseEntity<>(productService.getAllProducts(), HttpStatus.OK);
-        }catch (Exception e){
-            logger.error("Exception while fetching all the products :: Error Message= {}",e.getMessage());
-            return new ResponseEntity<>("Exception while fetching all the products!",HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @PostMapping("/insertProduct")
-    public ResponseEntity<?> saveProduct(@RequestBody @Valid ProductDTO productDTO) {
+    public ResponseEntity<?> insertProduct(@RequestBody @Valid ProductDTO productDTO) {
         logger.info("Inside saveProduct rest call");
         try {
-            return new ResponseEntity<>(productService.saveProduct(productDTO),HttpStatus.CREATED);
+            return new ResponseEntity<>(productService.insertProduct(productDTO),HttpStatus.CREATED);
         } catch (Exception e) {
             logger.error("Exception while inserting the product with productId:{} :: Error Message= {}",productDTO.getProductId(),e.getMessage());
             return new ResponseEntity<>("Exception while inserting the product!",HttpStatus.INTERNAL_SERVER_ERROR);
