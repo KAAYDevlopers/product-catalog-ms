@@ -1,5 +1,6 @@
 package com.abw12.absolutefitness.productcatelog.persistance;
 
+import com.abw12.absolutefitness.productcatelog.dto.ProductFiltersDTO;
 import com.abw12.absolutefitness.productcatelog.entity.ProductCategoryDAO;
 import com.abw12.absolutefitness.productcatelog.entity.ProductDAO;
 import com.abw12.absolutefitness.productcatelog.entity.ProductVariantDAO;
@@ -59,6 +60,12 @@ public class ProductPersistanceLayer {
     public List<ProductDAO> getProductByCategoryId(Long categoryId){
         return productRepository.getProductsByCategoryID(categoryId);
     }
-    
-    
+
+    public List<ProductDAO> getProductsByFilters(ProductFiltersDTO filtersDTO){
+        return productRepository.getProductByFilters(filtersDTO);
+    }
+
+    public List<ProductVariantDAO> getVariantsByFilters(Long productId ,ProductFiltersDTO filtersDTO){
+        return productVariantRepository.getVariantsByFilters(productId,filtersDTO);
+    }
 }

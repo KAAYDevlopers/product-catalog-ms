@@ -2,6 +2,7 @@ package com.abw12.absolutefitness.productcatelog.service;
 
 import com.abw12.absolutefitness.productcatelog.dto.ProductCategoryDTO;
 import com.abw12.absolutefitness.productcatelog.dto.ProductDTO;
+import com.abw12.absolutefitness.productcatelog.dto.ProductFiltersDTO;
 import com.abw12.absolutefitness.productcatelog.dto.ProductVariantDTO;
 import com.abw12.absolutefitness.productcatelog.entity.ProductCategoryDAO;
 import com.abw12.absolutefitness.productcatelog.entity.ProductDAO;
@@ -10,6 +11,7 @@ import com.abw12.absolutefitness.productcatelog.mappers.ProductCategoryMapper;
 import com.abw12.absolutefitness.productcatelog.mappers.ProductMapper;
 import com.abw12.absolutefitness.productcatelog.mappers.ProductVariantMapper;
 import com.abw12.absolutefitness.productcatelog.persistance.ProductPersistanceLayer;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +46,6 @@ public class ProductService {
         productDTO.setProductVariants(pVariantDTOList);
         productDTO.setProductCategory(pCategory);
         return  productDTO;
-
     }
 
     public List<ProductDTO> getProductByName(String productName) {
@@ -68,6 +69,7 @@ public class ProductService {
                 })
                 .toList();
     }
+
     public List<ProductDTO> getProductsByCategoryId(Long categoryId) {
         return persistanceLayer.getProductByCategoryId(categoryId).stream()
                 .map(productDAO -> {
@@ -84,7 +86,7 @@ public class ProductService {
                 })
                 .collect(Collectors.toList());
     }
-
+    @Transactional
     public ProductDTO insertProduct(ProductDTO productDTO){
 
         ProductDAO productEntity = productMapper.DtoToEntity(productDTO);
@@ -122,8 +124,8 @@ public class ProductService {
         }
     }
 
+    @Transactional
     public ProductDTO updateProduct(ProductDTO productDTO){
-
         if(productDTO.getProductId() == null)
             throw new RuntimeException("productId cannot be NULL");
 
@@ -152,5 +154,25 @@ public class ProductService {
         return productResponse;
     }
 
+    public List<ProductDTO> filterProduct(ProductFiltersDTO filtersDTO){
+        if(filtersDTO.getCategoryId() == null)
+            throw new RuntimeException("categoryId cannot be NULL");
+        //product list for current category
+        List<ProductDTO> productList = persistanceLayer.getProductsByFilters(filtersDTO).stream()
+                .map(productDAO -> productMapper.entityToDto(productDAO))
+                .toList();
+
+        return productList.stream()
+                .peek(productDTO -> {
+                    List<ProductVariantDTO> productVariants = persistanceLayer.getVariantsByFilters(productDTO.getProductId(), filtersDTO).stream()
+                            .map(productVariantDAO -> productVariantMapper.entityToDto(productVariantDAO))
+                            .toList();
+                    productDTO.setProductVariants(productVariants);
+                    productDTO.setProductCategory(productCategoryMapper.entityToDto(persistanceLayer.getCategoryById(filtersDTO.getCategoryId())));
+                })
+                .filter(productDTO -> productDTO.getProductVariants().size() > 0)
+                .toList();
+
+    }
 
 }

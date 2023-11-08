@@ -38,6 +38,10 @@ public class ProductVariantDAO {
     private String usageDose;
     @Column(name = "manufacturer_details")
     private String manufacturerDetails;
+    @Column(name = "number_of_servings")
+    private Integer numberOfServings;
+    @Column(name = "variant_type")
+    private String variantType;
     @Column(name="buy_price")
     private Double buyPrice;
     @Column(name="on_sale_price")

@@ -23,6 +23,8 @@ public class ProductVariantDTO {
     private String nutritionFacts;
     private String usageDose;
     private String manufacturerDetails;
+    private String variantType;
+    private Integer numberOfServings;
     //    @JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "dd-MM-yyyy")
     private OffsetDateTime expiryDate;
     //    @JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "dd-MM-yyyy")

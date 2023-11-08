@@ -1,8 +1,10 @@
 package com.abw12.absolutefitness.productcatelog.repository;
 
+import com.abw12.absolutefitness.productcatelog.dto.ProductFiltersDTO;
 import com.abw12.absolutefitness.productcatelog.entity.ProductDAO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,8 +26,11 @@ public interface ProductRepository extends JpaRepository<ProductDAO,Long> {
     @Query("SELECT p FROM ProductDAO p WHERE p.productName =:productName")
     List<ProductDAO> getProductByName(String productName);
 
-    @Query("Select p FROM ProductDAO p WHERE p.categoryId =:categoryId")
+    @Query("SELECT p FROM ProductDAO p WHERE p.categoryId =:categoryId")
     List<ProductDAO> getProductsByCategoryID(Long categoryId);
+    @Query("SELECT p FROM ProductDAO p WHERE (p.categoryId =:#{#filters.categoryId}) AND " +
+            "(:#{#filters.brandName} is null or p.brandName = :#{#filters.brandName}) ")
+    List<ProductDAO> getProductByFilters(@Param("filters") ProductFiltersDTO filters);
 //    @Query("{'productName':?0}")
 //    ProductDAO getProductByName(String productName);
 //
