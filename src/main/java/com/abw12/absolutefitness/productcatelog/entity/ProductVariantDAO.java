@@ -27,7 +27,7 @@ public class ProductVariantDAO {
     private String variantName;
     @Column(name = "variant_value")
     private String variantValue;
-    private String sku;
+//    private String sku;
     @Column(name = "image_path")
     private String imagePath;
     private String about;

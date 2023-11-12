@@ -1,4 +1,4 @@
-package com.abw12.absolutefitness.productcatelog.persistance;
+package com.abw12.absolutefitness.productcatelog.persistence;
 
 import com.abw12.absolutefitness.productcatelog.dto.ProductFiltersDTO;
 import com.abw12.absolutefitness.productcatelog.entity.ProductCategoryDAO;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class ProductPersistanceLayer {
+public class ProductPersistenceLayer {
 
     @Autowired
     private ProductRepository productRepository;

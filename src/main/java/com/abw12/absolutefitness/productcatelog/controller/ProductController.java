@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/catelog/product")
 public class ProductController {
 
     private static Logger logger = LoggerFactory.getLogger(ProductController.class);

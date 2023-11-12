@@ -12,7 +12,9 @@ import java.time.OffsetDateTime;
 public class ProductInventoryDTO {
 
     private Long productInventoryId;
+    private Long variantId;
     private Long stockInTotal;
+    private String sku;
     private OffsetDateTime createdAt;
     private OffsetDateTime modifiedAt;
 }

@@ -22,6 +22,7 @@ public class ProductInventoryDAO {
     private Long variantId;
     @Column(name="stock_total")
     private Long stockTotal;
+    private String sku;
     @Column(name="created_at")
     private OffsetDateTime createdAt;
     @Column(name="modified_at")

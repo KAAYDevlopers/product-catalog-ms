@@ -1,16 +1,13 @@
 package com.abw12.absolutefitness.productcatelog.service;
 
-import com.abw12.absolutefitness.productcatelog.dto.ProductCategoryDTO;
-import com.abw12.absolutefitness.productcatelog.dto.ProductDTO;
-import com.abw12.absolutefitness.productcatelog.dto.ProductFiltersDTO;
-import com.abw12.absolutefitness.productcatelog.dto.ProductVariantDTO;
+import com.abw12.absolutefitness.productcatelog.dto.*;
 import com.abw12.absolutefitness.productcatelog.entity.ProductCategoryDAO;
 import com.abw12.absolutefitness.productcatelog.entity.ProductDAO;
 import com.abw12.absolutefitness.productcatelog.entity.ProductVariantDAO;
 import com.abw12.absolutefitness.productcatelog.mappers.ProductCategoryMapper;
 import com.abw12.absolutefitness.productcatelog.mappers.ProductMapper;
 import com.abw12.absolutefitness.productcatelog.mappers.ProductVariantMapper;
-import com.abw12.absolutefitness.productcatelog.persistance.ProductPersistanceLayer;
+import com.abw12.absolutefitness.productcatelog.persistence.ProductPersistenceLayer;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,23 +20,31 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     @Autowired
-    private ProductPersistanceLayer persistanceLayer;
+    private ProductPersistenceLayer persistenceLayer;
     @Autowired
     private ProductMapper productMapper;
     @Autowired
     private ProductVariantMapper productVariantMapper;
     @Autowired
     private ProductCategoryMapper productCategoryMapper;
+
+    @Autowired
+    private ProductInventoryService inventoryService;
     public ProductDTO getProductById(Long productId) {
 
-        ProductDAO productEntity = persistanceLayer.getProductById(productId);
+        ProductDAO productEntity = persistenceLayer.getProductById(productId);
         Long categoryId = productEntity.getCategoryId();
-        List<ProductVariantDAO> variantsList = persistanceLayer.getVariantsByProductId(productId);
-        ProductCategoryDAO category = persistanceLayer.getCategoryById(categoryId);
+        List<ProductVariantDAO> variantsList = persistenceLayer.getVariantsByProductId(productId);
+        ProductCategoryDAO category = persistenceLayer.getCategoryById(categoryId);
 
         ProductDTO productDTO = productMapper.entityToDto(productEntity);
         List<ProductVariantDTO> pVariantDTOList = variantsList.stream()
-                .map(variant -> productVariantMapper.entityToDto(variant))
+                .map(variant -> {
+                    ProductVariantDTO variantDTO = productVariantMapper.entityToDto(variant);
+                    ProductInventoryDTO inventoryDTO = inventoryService.getVariantById(variantDTO.getVariantId());
+                    variantDTO.setInventoryData(inventoryDTO);
+                    return variantDTO;
+                })
                 .toList();
         ProductCategoryDTO pCategory = productCategoryMapper.entityToDto(category);
 
@@ -50,17 +55,22 @@ public class ProductService {
 
     public List<ProductDTO> getProductByName(String productName) {
 
-        List<ProductDAO> productEntityList = persistanceLayer.getProductByName(productName);
+        List<ProductDAO> productEntityList = persistenceLayer.getProductByName(productName);
 
         return productEntityList.stream()
                 .map(product -> {
                     Long productId = product.getProductId();
                     Long categoryId = product.getCategoryId();
-                    List<ProductVariantDAO> variantsList = persistanceLayer.getVariantsByProductId(productId);
-                    ProductCategoryDAO category = persistanceLayer.getCategoryById(categoryId);
+                    List<ProductVariantDAO> variantsList = persistenceLayer.getVariantsByProductId(productId);
+                    ProductCategoryDAO category = persistenceLayer.getCategoryById(categoryId);
                     ProductDTO productDTO = productMapper.entityToDto(product);
                     List<ProductVariantDTO> pVariantDTOList = variantsList.stream()
-                            .map(variant -> productVariantMapper.entityToDto(variant))
+                            .map(variant -> {
+                                ProductVariantDTO variantDTO = productVariantMapper.entityToDto(variant);
+                                ProductInventoryDTO inventoryDTO = inventoryService.getVariantById(variantDTO.getVariantId());
+                                variantDTO.setInventoryData(inventoryDTO);
+                                return variantDTO;
+                            })
                             .toList();
                     ProductCategoryDTO pCategory = productCategoryMapper.entityToDto(category);
                     productDTO.setProductVariants(pVariantDTOList);
@@ -71,15 +81,20 @@ public class ProductService {
     }
 
     public List<ProductDTO> getProductsByCategoryId(Long categoryId) {
-        return persistanceLayer.getProductByCategoryId(categoryId).stream()
+        return persistenceLayer.getProductByCategoryId(categoryId).stream()
                 .map(productDAO -> {
                     ProductDTO product = productMapper.entityToDto(productDAO);
 
                     Long productId = productDAO.getProductId();
-                    List<ProductVariantDTO> variantList =  persistanceLayer.getVariantsByProductId(productId)
-                            .stream().map(productVariantDAO -> productVariantMapper.entityToDto(productVariantDAO))
+                    List<ProductVariantDTO> variantList =  persistenceLayer.getVariantsByProductId(productId)
+                            .stream().map(variant -> {
+                                ProductVariantDTO variantDTO = productVariantMapper.entityToDto(variant);
+                                ProductInventoryDTO inventoryDTO = inventoryService.getVariantById(variantDTO.getVariantId());
+                                variantDTO.setInventoryData(inventoryDTO);
+                                return variantDTO;
+                            })
                             .toList();
-                    ProductCategoryDTO productCategoryDTO = productCategoryMapper.entityToDto(persistanceLayer.getCategoryById(productDAO.getCategoryId()));
+                    ProductCategoryDTO productCategoryDTO = productCategoryMapper.entityToDto(persistenceLayer.getCategoryById(productDAO.getCategoryId()));
                     product.setProductCategory(productCategoryDTO);
                     product.setProductVariants(variantList);
                     return product;
@@ -95,7 +110,7 @@ public class ProductService {
         ProductCategoryDTO productCategoryDTO = checkIfCategoryExist(productCategory.getCategoryName(), productCategory);
         productEntity.setCategoryId(productCategoryDTO.getProductCategoryId()); //to maintain foreign key in product table for categoryId
 
-        ProductDTO storedProductResponse = productMapper.entityToDto(persistanceLayer.upsertProductData(productEntity));
+        ProductDTO storedProductResponse = productMapper.entityToDto(persistenceLayer.upsertProductData(productEntity));
 
         Long productId = storedProductResponse.getProductId();
         List<ProductVariantDAO> productVariantsList = productDTO.getProductVariants().stream()
@@ -106,7 +121,7 @@ public class ProductService {
                 })
                 .toList();
 
-        List<ProductVariantDTO> variantDBResponse = persistanceLayer.upsertVariantData(productVariantsList).stream()
+        List<ProductVariantDTO> variantDBResponse = persistenceLayer.upsertVariantData(productVariantsList).stream()
                 .map(productVariantDAO -> productVariantMapper.entityToDto(productVariantDAO))
                 .toList();
 
@@ -116,11 +131,11 @@ public class ProductService {
     }
 
     public ProductCategoryDTO checkIfCategoryExist(String categoryName,ProductCategoryDAO productCategory){
-        Optional<ProductCategoryDAO> categoryObj = persistanceLayer.getCategoryByName(categoryName);
+        Optional<ProductCategoryDAO> categoryObj = persistenceLayer.getCategoryByName(categoryName);
         if(categoryObj.isPresent()){
             return productCategoryMapper.entityToDto(categoryObj.get());
         }else{
-            return productCategoryMapper.entityToDto(persistanceLayer.upsertCategoryData(productCategory));
+            return productCategoryMapper.entityToDto(persistenceLayer.upsertCategoryData(productCategory));
         }
     }
 
@@ -129,13 +144,15 @@ public class ProductService {
         if(productDTO.getProductId() == null)
             throw new RuntimeException("productId cannot be NULL");
 
+        Long productId = productDTO.getProductId();
         ProductDAO productEntity = productMapper.DtoToEntity(productDTO);
         List<ProductVariantDAO> productVariantsList = productDTO.getProductVariants().stream()
                 .map(productVariantDTO -> {
                     if(productVariantDTO.getVariantId() == null)
                         throw new RuntimeException("variantId cannot be NULL");
-
-                    return productVariantMapper.DtoToEntity(productVariantDTO);
+                    ProductVariantDAO variant = productVariantMapper.DtoToEntity(productVariantDTO);
+                    variant.setProductId(productId);
+                    return variant;
                 })
                 .toList();
 
@@ -143,9 +160,9 @@ public class ProductService {
             throw new RuntimeException("product category categoryId cannot be NULL");
         ProductCategoryDAO productCategoryEntity = productCategoryMapper.DtoToEntity(productDTO.getProductCategory());
 
-        ProductDTO productResponse =productMapper.entityToDto(persistanceLayer.upsertProductData(productEntity));
-        ProductCategoryDTO productCategoryResponse = productCategoryMapper.entityToDto(persistanceLayer.upsertCategoryData(productCategoryEntity));
-        List<ProductVariantDTO> productVariantsResponse = persistanceLayer.upsertVariantData(productVariantsList).stream()
+        ProductDTO productResponse =productMapper.entityToDto(persistenceLayer.upsertProductData(productEntity));
+        ProductCategoryDTO productCategoryResponse = productCategoryMapper.entityToDto(persistenceLayer.upsertCategoryData(productCategoryEntity));
+        List<ProductVariantDTO> productVariantsResponse = persistenceLayer.upsertVariantData(productVariantsList).stream()
                 .map(productVariantDAO -> productVariantMapper.entityToDto(productVariantDAO))
                 .toList();
 
@@ -158,21 +175,20 @@ public class ProductService {
         if(filtersDTO.getCategoryId() == null)
             throw new RuntimeException("categoryId cannot be NULL");
         //product list for current category
-        List<ProductDTO> productList = persistanceLayer.getProductsByFilters(filtersDTO).stream()
+        List<ProductDTO> productList = persistenceLayer.getProductsByFilters(filtersDTO).stream()
                 .map(productDAO -> productMapper.entityToDto(productDAO))
                 .toList();
 
         return productList.stream()
                 .peek(productDTO -> {
-                    List<ProductVariantDTO> productVariants = persistanceLayer.getVariantsByFilters(productDTO.getProductId(), filtersDTO).stream()
+                    List<ProductVariantDTO> productVariants = persistenceLayer.getVariantsByFilters(productDTO.getProductId(), filtersDTO).stream()
                             .map(productVariantDAO -> productVariantMapper.entityToDto(productVariantDAO))
                             .toList();
                     productDTO.setProductVariants(productVariants);
-                    productDTO.setProductCategory(productCategoryMapper.entityToDto(persistanceLayer.getCategoryById(filtersDTO.getCategoryId())));
+                    productDTO.setProductCategory(productCategoryMapper.entityToDto(persistenceLayer.getCategoryById(filtersDTO.getCategoryId())));
                 })
                 .filter(productDTO -> productDTO.getProductVariants().size() > 0)
                 .toList();
-
     }
 
 }
