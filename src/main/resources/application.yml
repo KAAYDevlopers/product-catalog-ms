@@ -9,7 +9,8 @@
 spring:
   datasource:
 #    url: jdbc:postgresql://172.17.0.2:5432/productcatalog
-    url: jdbc:postgresql://postgres-service:5432/productcatelog
+#    url: jdbc:postgresql://postgres-service:5432/productcatelog
+    url: jdbc:postgresql://localhost:5432/productcatalog
     username: postgres
     password: password
     driver-class-name: org.postgresql.Driver

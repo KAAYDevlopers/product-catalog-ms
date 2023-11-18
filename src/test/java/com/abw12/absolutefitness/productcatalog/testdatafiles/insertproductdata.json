@@ -1,0 +1,38 @@
+{
+  "productName": "MuscleTech Nitrotech",
+  "productDescription": "Nitrotech from MuscleTech USA",
+  "brandName": "MuscleTech",
+  "productCategory": {
+    "categoryName": "Whey Protein",
+    "categoryDescription": "suitable for weight training"
+  },
+  "productVariants": [
+    {
+      "variantName": "Belgium, Chocolate",
+      "variantValue": "5kg",
+      "imagePath": "http://google.com",
+      "buyPrice": 19400.0,
+      "onSalePrice": 17500.0,
+      "about": "Raw and real",
+      "benefits": "some benefits",
+      "nutritionFacts": "Some nutrition facts",
+      "usageDose": "once a day before during workout",
+      "manufacturerDetails": "USA",
+      "variantType": "non-veg",
+      "numberOfServings": 60,
+      "inventoryData": {
+        "quantity": 3,
+        "sku": "kjsuvccsa222d",
+        "inStockStatus": true,
+        "createdAt": "2023-11-11T14:06:15.608Z",
+        "modifiedAt": "2023-11-11T14:06:15.608Z"
+      },
+      "expiryDate": "2024-12-01T13:40:25Z",
+      "mfdDate": "2022-12-01T13:40:25Z",
+      "variantCreatedAt": "2023-06-02T02:10:25Z",
+      "variantModifiedAt": "2020-07-11T02:10:25Z"
+    }
+  ],
+  "productCreatedAt": "2023-07-01T13:40:25Z",
+  "productModifiedAt": "2020-07-10T13:40:25Z"
+}
