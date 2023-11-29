@@ -1,17 +1,18 @@
 openapi: 3.0.1
 info:
   title: Product-Catalog-MS
-  description: "Handle product CRUD operations example for fetching product details,listing\
-    \ different types of products"
+  description: "Handle product and product inventory CRUD operations example for fetching\
+    \ product details,listing different types of products and keep track of product\
+    \ inventory"
   version: "3.0"
 servers:
-- url: http://localhost:8090
-  description: Generated server url
+  - url: http://localhost:8090
+    description: Generated server url
 paths:
-  /product/updateProduct:
+  /catalog/product/updateProduct:
     put:
       tags:
-      - product-controller
+        - product-controller
       operationId: updateProduct
       requestBody:
         content:
@@ -20,33 +21,76 @@ paths:
               $ref: '#/components/schemas/ProductDTO'
         required: true
       responses:
-        "404":
-          description: Not Found
-          content:
-            '*/*':
-              schema:
-                type: string
         "400":
           description: Bad Request
           content:
             '*/*':
               schema:
                 oneOf:
-                - type: object
-                  additionalProperties:
-                    type: string
-                - type: string
+                  - type: string
+                  - type: object
+                    additionalProperties:
+                      type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
         "200":
           description: OK
           content:
             '*/*':
               schema:
                 type: object
-  /product/insertProduct:
+  /catalog/product/insertVariantByProductId/{productId}:
     post:
       tags:
-      - product-controller
-      operationId: saveProduct
+        - product-controller
+      operationId: upsertVariantByProductId
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProductVariantDTO'
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - type: string
+                  - type: object
+                    additionalProperties:
+                      type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /catalog/product/insertProduct:
+    post:
+      tags:
+        - product-controller
+      operationId: insertProduct
       requestBody:
         content:
           application/json:
@@ -54,188 +98,301 @@ paths:
               $ref: '#/components/schemas/ProductDTO'
         required: true
       responses:
-        "404":
-          description: Not Found
-          content:
-            '*/*':
-              schema:
-                type: string
         "400":
           description: Bad Request
           content:
             '*/*':
               schema:
                 oneOf:
-                - type: object
-                  additionalProperties:
-                    type: string
-                - type: string
+                  - type: string
+                  - type: object
+                    additionalProperties:
+                      type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
         "200":
           description: OK
           content:
             '*/*':
               schema:
                 type: object
-  /product/getProductByName/{productName}:
+  /catalog/inventory/updateVariantInventory:
+    post:
+      tags:
+        - product-inventory-controller
+      operationId: updateVariantInventory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInventoryDTO'
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - type: string
+                  - type: object
+                    additionalProperties:
+                      type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /catalog/product/getVariantData/{variantId}:
     get:
       tags:
-      - product-controller
+        - product-controller
+      operationId: getVariantData
+      parameters:
+        - name: variantId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - type: string
+                  - type: object
+                    additionalProperties:
+                      type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /catalog/product/getProductByName/{productName}:
+    get:
+      tags:
+        - product-controller
       operationId: getProductByName
       parameters:
-      - name: productName
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: productName
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
-        "404":
-          description: Not Found
-          content:
-            '*/*':
-              schema:
-                type: string
         "400":
           description: Bad Request
           content:
             '*/*':
               schema:
                 oneOf:
-                - type: object
-                  additionalProperties:
-                    type: string
-                - type: string
+                  - type: string
+                  - type: object
+                    additionalProperties:
+                      type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
         "200":
           description: OK
           content:
             '*/*':
               schema:
                 type: object
-  /product/getProductById/{productId}:
+  /catalog/product/getProductById/{productId}:
     get:
       tags:
-      - product-controller
+        - product-controller
       operationId: getProductById
       parameters:
-      - name: productId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
-        "404":
-          description: Not Found
-          content:
-            '*/*':
-              schema:
-                type: string
         "400":
           description: Bad Request
           content:
             '*/*':
               schema:
                 oneOf:
-                - type: object
-                  additionalProperties:
-                    type: string
-                - type: string
+                  - type: string
+                  - type: object
+                    additionalProperties:
+                      type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
         "200":
           description: OK
           content:
             '*/*':
               schema:
                 type: object
-  /product/getProductByCatLogID/{categoryName}:
+  /catalog/product/filterProduct:
     get:
       tags:
-      - product-controller
-      operationId: getProductByCategoryName
+        - product-controller
+      operationId: productFilters
       parameters:
-      - name: categoryName
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: productFilters
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProductFiltersDTO'
       responses:
-        "404":
-          description: Not Found
-          content:
-            '*/*':
-              schema:
-                type: string
         "400":
           description: Bad Request
           content:
             '*/*':
               schema:
                 oneOf:
-                - type: object
-                  additionalProperties:
-                    type: string
-                - type: string
+                  - type: string
+                  - type: object
+                    additionalProperties:
+                      type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
         "200":
           description: OK
           content:
             '*/*':
               schema:
                 type: object
-  /product/getProductByCatLogID/{categoryID}:
+  /catalog/product/categories/{categoryID}:
     get:
       tags:
-      - product-controller
+        - product-controller
       operationId: getProductByCategoryID
       parameters:
-      - name: categoryID
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: categoryID
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
-        "404":
-          description: Not Found
-          content:
-            '*/*':
-              schema:
-                type: string
         "400":
           description: Bad Request
           content:
             '*/*':
               schema:
                 oneOf:
-                - type: object
-                  additionalProperties:
-                    type: string
-                - type: string
+                  - type: string
+                  - type: object
+                    additionalProperties:
+                      type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
         "200":
           description: OK
           content:
             '*/*':
               schema:
                 type: object
-  /product/getAllProducts:
+  /catalog/inventory/validateAvailability:
     get:
       tags:
-      - product-controller
-      operationId: getAllProducts
+        - product-inventory-controller
+      operationId: validateAvailability
+      parameters:
+        - name: variantIds
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
       responses:
-        "404":
-          description: Not Found
-          content:
-            '*/*':
-              schema:
-                type: string
         "400":
           description: Bad Request
           content:
             '*/*':
               schema:
                 oneOf:
-                - type: object
-                  additionalProperties:
-                    type: string
-                - type: string
+                  - type: string
+                  - type: object
+                    additionalProperties:
+                      type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /catalog/inventory/getVariantInventory/{variantId}:
+    get:
+      tags:
+        - product-inventory-controller
+      operationId: getVariantInventoryData
+      parameters:
+        - name: variantId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - type: string
+                  - type: object
+                    additionalProperties:
+                      type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
         "200":
           description: OK
           content:
@@ -244,26 +401,21 @@ paths:
                 type: object
 components:
   schemas:
-    ProductCatagoryDTO:
+    ProductCategoryDTO:
       type: object
       properties:
-        id:
+        productCategoryId:
+          type: integer
+          format: int64
+        categoryName:
           type: string
-        catagoryName:
+        categoryDescription:
           type: string
-        catagoryDesc:
-          type: string
-        createdDate:
-          type: string
-          format: date-time
-        modifiedDate:
-          type: string
-          format: date-time
     ProductDTO:
       required:
-      - brand
-      - productCatagory
-      - productName
+        - brandName
+        - productCategory
+        - productName
       type: object
       properties:
         productId:
@@ -271,118 +423,109 @@ components:
           format: int64
         productName:
           type: string
-        brand:
+        productDescription:
           type: string
-        productCatagory:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductCatagoryDTO'
+        categoryId:
+          type: integer
+          format: int64
+        brandName:
+          type: string
+        productCategory:
+          $ref: '#/components/schemas/ProductCategoryDTO'
         productVariants:
           type: array
           items:
             $ref: '#/components/schemas/ProductVariantDTO'
-        productDescription:
-          $ref: '#/components/schemas/ProductDescriptionDTO'
-        productDiscounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductDiscountsDTO'
-        inventoryInfo:
-          $ref: '#/components/schemas/ProductInventoryDTO'
-        createdDate:
+        productCreatedAt:
           type: string
-          format: date-time
-        modifiedDate:
+        productModifiedAt:
           type: string
-          format: date-time
-    ProductDescriptionDTO:
+    ProductInventoryDTO:
       type: object
       properties:
+        productInventoryId:
+          type: integer
+          format: int64
+        variantId:
+          type: integer
+          format: int64
+        quantity:
+          type: integer
+          format: int64
+        sku:
+          type: string
+        inStockStatus:
+          type: boolean
+        createdAt:
+          type: string
+        modifiedAt:
+          type: string
+    ProductVariantDTO:
+      type: object
+      properties:
+        variantId:
+          type: integer
+          format: int64
+        productId:
+          type: integer
+          format: int64
+        variantName:
+          type: string
+        variantValue:
+          type: string
+        imagePath:
+          type: string
+        buyPrice:
+          type: number
+          format: double
+        onSalePrice:
+          type: number
+          format: double
         about:
           type: string
         benefits:
           type: string
-        nutritionalFacts:
-          type: object
-          additionalProperties:
-            type: number
-            format: double
-        usage:
+        nutritionFacts:
+          type: string
+        usageDose:
           type: string
         manufacturerDetails:
           type: string
-        expiryDate:
+        variantType:
           type: string
-          format: date-time
-        mfdDate:
-          type: string
-          format: date-time
-        createdDate:
-          type: string
-          format: date-time
-        modifiedDate:
-          type: string
-          format: date-time
-        ingredients:
-          type: array
-          items:
-            type: string
-    ProductDiscountsDTO:
-      type: object
-      properties:
-        id:
-          type: string
-        discountName:
-          type: string
-        discountPercent:
-          type: number
-          format: double
-        validity:
-          type: string
-          format: date-time
-        createdDate:
-          type: string
-          format: date-time
-        modifiedDate:
-          type: string
-          format: date-time
-    ProductInventoryDTO:
-      type: object
-      properties:
-        id:
-          type: string
-        quantity:
-          type: string
-        createdDate:
-          type: string
-          format: date-time
-        modifiedDate:
-          type: string
-          format: date-time
-    ProductVariantDTO:
-      type: object
-      properties:
-        id:
+        numberOfServings:
           type: integer
           format: int32
-        productId:
+        inventoryData:
+          $ref: '#/components/schemas/ProductInventoryDTO'
+        expiryDate:
           type: string
-        productVariantDesc:
+        mfdDate:
           type: string
-        sku:
+        variantCreatedAt:
           type: string
-        volumn:
+        variantModifiedAt:
           type: string
-        imagePath:
+    ProductFiltersDTO:
+      type: object
+      properties:
+        categoryId:
+          type: integer
+          format: int64
+        brandName:
           type: string
-        price:
+        variantName:
+          type: string
+        variantValue:
+          type: string
+        numberOfServings:
+          type: integer
+          format: int32
+        variantType:
+          type: string
+        minOnSalePrice:
           type: number
           format: double
-        productFlavour:
-          type: string
-        createdDate:
-          type: string
-          format: date-time
-        modifiedDate:
-          type: string
-          format: date-time
+        maxOnSalePrice:
+          type: number
+          format: double

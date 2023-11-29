@@ -12,6 +12,6 @@ import java.util.Optional;
 public interface ProductInventoryRepository extends JpaRepository<ProductInventoryDAO,Long> {
 
     @Query("SELECT i FROM ProductInventoryDAO i WHERE i.variantId = :variantId")
-    Optional<ProductInventoryDAO> getVariantDataById(@Param("variantId") Long variantId);
+    Optional<ProductInventoryDAO> getVariantDataById(@Param("variantId") String variantId);
 
 }

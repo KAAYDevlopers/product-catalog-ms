@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface ProductCategoryRepository extends JpaRepository<ProductCategoryDAO,Long> {
 
     @Query("SELECT c FROM ProductCategoryDAO c WHERE c.productCategoryId = :categoryId")
-    Optional<ProductCategoryDAO> getProductCategory(Long categoryId);
+    Optional<ProductCategoryDAO> getProductCategory(String categoryId);
 
     @Query("SELECT c FROM ProductCategoryDAO c WHERE c.categoryName = :categoryName")
     Optional<ProductCategoryDAO> getProductCategoryByName(String categoryName);

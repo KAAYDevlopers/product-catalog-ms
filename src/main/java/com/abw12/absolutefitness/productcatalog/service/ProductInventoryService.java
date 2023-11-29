@@ -23,13 +23,13 @@ public class ProductInventoryService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductInventoryService.class);
 
-    public ProductInventoryDTO getVariantById(Long variantId){
+    public ProductInventoryDTO getVariantById(String variantId){
         return inventoryMapper.entityToDto(pInventoryPersistenceLayer.getVariantData(variantId));
     }
     public ProductInventoryDTO updateVariantInventoryData(ProductInventoryDTO inventoryDto){
         return inventoryMapper.entityToDto(setStockStatusAndSaveVariant(inventoryDto));
     }
-    public Map<Long,Boolean> variantsValidation(List<Long> variantIdsList){
+    public Map<String,Boolean> variantsValidation(List<String> variantIdsList){
         return variantIdsList.stream()
                 .map(variantId -> pInventoryPersistenceLayer.getVariantData(variantId))
                 .collect(Collectors.toMap(ProductInventoryDAO::getVariantId, ProductInventoryDAO::getInStockStatus, (k1, k2) -> k2));

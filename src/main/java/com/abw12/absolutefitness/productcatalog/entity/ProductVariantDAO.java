@@ -5,21 +5,22 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "productvariant")
+@Table(name = "productvariant" ,schema = "productcatalog")
 public class ProductVariantDAO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "variant_id")
-    private Long variantId;
+    private String variantId;
     @Column(name="product_id")
-    private Long productId;
+    private String productId;
     //    @ManyToOne
 //    @JoinColumn(name="product_id")
 //    private ProductDAO product;
@@ -27,7 +28,6 @@ public class ProductVariantDAO {
     private String variantName;
     @Column(name = "variant_value")
     private String variantValue;
-//    private String sku;
     @Column(name = "image_path")
     private String imagePath;
     private String about;
@@ -43,9 +43,9 @@ public class ProductVariantDAO {
     @Column(name = "variant_type")
     private String variantType;
     @Column(name="buy_price")
-    private Double buyPrice;
+    private BigDecimal buyPrice;
     @Column(name="on_sale_price")
-    private Double onSalePrice;
+    private BigDecimal onSalePrice;
     @Column(name="mfd_date")
     private OffsetDateTime mfdDate;
     @Column(name="expiry_date")

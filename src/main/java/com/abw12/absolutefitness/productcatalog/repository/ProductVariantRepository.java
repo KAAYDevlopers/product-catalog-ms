@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface ProductVariantRepository  extends JpaRepository<ProductVariantDAO,Long> {
 
     @Query("SELECT v FROM ProductVariantDAO v WHERE v.productId =:productId")
-    List<ProductVariantDAO> getVariantsByProductId(@Param("productId") Long productId);
+    List<ProductVariantDAO> getVariantsByProductId(@Param("productId") String productId);
     @Query("SELECT v FROM ProductVariantDAO v WHERE " +
             "(v.productId =:productId) AND "+
             "(:#{#filters.variantName} is null or v.variantName = :#{#filters.variantName}) AND" +
@@ -23,7 +23,7 @@ public interface ProductVariantRepository  extends JpaRepository<ProductVariantD
             "(:#{#filters.variantType} is null or v.variantType = :#{#filters.variantType}) AND" +
             "(:#{#filters.minOnSalePrice} is null or v.onSalePrice >= :#{#filters.minOnSalePrice}) AND" +
             "(:#{#filters.maxOnSalePrice} is null or v.onSalePrice <= :#{#filters.maxOnSalePrice})")
-    List<ProductVariantDAO> getVariantsByFilters(@Param("productId") Long productId ,  @Param("filters") ProductFiltersDTO filters);
+    List<ProductVariantDAO> getVariantsByFilters(@Param("productId") String productId ,  @Param("filters") ProductFiltersDTO filters);
     @Query("SELECT v FROM ProductVariantDAO v WHERE v.variantId =:variantId")
-    Optional<ProductVariantDAO> getVariantData(@Param("variantId") Long variantId);
+    Optional<ProductVariantDAO> getVariantData(@Param("variantId") String variantId);
 }

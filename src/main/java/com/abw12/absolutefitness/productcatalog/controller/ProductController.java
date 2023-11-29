@@ -25,7 +25,7 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/getProductById/{productId}")
-    public ResponseEntity<?> getProductById(@PathVariable Long productId){
+    public ResponseEntity<?> getProductById(@PathVariable String productId){
         logger.info("Inside getProductById rest call: {} " , productId);
         try{
             return new ResponseEntity<>(productService.getProductById(productId),HttpStatus.OK);
@@ -49,7 +49,7 @@ public class ProductController {
     }
 
     @GetMapping("/categories/{categoryID}")
-    public ResponseEntity<?> getProductByCategoryID(@PathVariable Long categoryID){
+    public ResponseEntity<?> getProductByCategoryID(@PathVariable String categoryID){
         logger.info("Inside getProductByCategoryID rest call: {} " , categoryID);
         try{
             return  new ResponseEntity<>(productService.getProductsByCategoryId(categoryID),HttpStatus.OK);
@@ -60,7 +60,7 @@ public class ProductController {
     }
 
     @GetMapping("/getVariantData/{variantId}")
-    public ResponseEntity<?> getVariantData(@PathVariable Long variantId){
+    public ResponseEntity<?> getVariantData(@PathVariable String variantId){
         logger.info("Inside getVariantData rest call");
         try{
             return new ResponseEntity<>(productService.getVariantDataByVariantId(variantId),HttpStatus.OK);
@@ -103,7 +103,7 @@ public class ProductController {
     }
 
     @PostMapping("/insertVariantByProductId/{productId}")
-    public ResponseEntity<?> upsertVariantByProductId(@PathVariable Long productId , @RequestBody  List<ProductVariantDTO> variantDTOList) {
+    public ResponseEntity<?> upsertVariantByProductId(@PathVariable String productId , @RequestBody  List<ProductVariantDTO> variantDTOList) {
         logger.info("Inside insertVariantByProductId rest call");
         try {
             return new ResponseEntity<>(productService.upsertVariantByProductId(productId,variantDTOList),HttpStatus.CREATED);

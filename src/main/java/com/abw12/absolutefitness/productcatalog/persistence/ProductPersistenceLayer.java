@@ -23,7 +23,7 @@ public class ProductPersistenceLayer {
     @Autowired
     private ProductCategoryRepository productCategoryRepository;
 
-    public ProductDAO getProductById(Long productId){
+    public ProductDAO getProductById(String productId){
 
         return productRepository.getProductById(productId).orElseThrow(() ->
                 new RuntimeException(String.format("Cannot find product by Id : %s",productId)));
@@ -32,11 +32,11 @@ public class ProductPersistenceLayer {
         return productRepository.getProductByName(productName);
     }
 
-    public List<ProductVariantDAO> getVariantsByProductId(Long productId){
+    public List<ProductVariantDAO> getVariantsByProductId(String productId){
         return productVariantRepository.getVariantsByProductId(productId);
     }
 
-    public ProductCategoryDAO getCategoryById(Long categoryId){
+    public ProductCategoryDAO getCategoryById(String categoryId){
         return productCategoryRepository.getProductCategory(categoryId).orElseThrow(() ->
                 new RuntimeException(String.format("Cannot find category by categoryId : %s",categoryId)));
     }
@@ -57,11 +57,11 @@ public class ProductPersistenceLayer {
         return productCategoryRepository.save(inputCategoryEntity);
     }
 
-    public List<ProductDAO> getProductByCategoryId(Long categoryId){
+    public List<ProductDAO> getProductByCategoryId(String categoryId){
         return productRepository.getProductsByCategoryID(categoryId);
     }
 
-    public ProductVariantDAO getProductVariantDataById(Long variantId){
+    public ProductVariantDAO getProductVariantDataById(String variantId){
         return productVariantRepository.getVariantData(variantId).orElseThrow(() ->
                 new RuntimeException(String.format("Cannot find variant by variantId : %s",variantId)));
     }
@@ -70,7 +70,7 @@ public class ProductPersistenceLayer {
         return productRepository.getProductByFilters(filtersDTO);
     }
 
-    public List<ProductVariantDAO> getVariantsByFilters(Long productId ,ProductFiltersDTO filtersDTO){
+    public List<ProductVariantDAO> getVariantsByFilters(String productId ,ProductFiltersDTO filtersDTO){
         return productVariantRepository.getVariantsByFilters(productId,filtersDTO);
     }
 

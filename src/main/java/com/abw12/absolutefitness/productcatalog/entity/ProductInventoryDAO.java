@@ -11,15 +11,15 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="productinventory")
+@Table(name="productinventory" ,schema = "productcatalog")
 public class ProductInventoryDAO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "product_inventory_id")
-    private Long productInventoryId;
+    private String productInventoryId;
     @Column(name="variant_id")
-    private Long variantId;
+    private String variantId;
     @Column(name="quantity")
     private Long quantity;
     private String sku;

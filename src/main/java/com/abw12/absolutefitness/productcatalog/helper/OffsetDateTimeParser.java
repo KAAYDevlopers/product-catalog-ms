@@ -5,7 +5,7 @@ import org.mapstruct.Named;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
-public interface DateTimeParser {
+public interface OffsetDateTimeParser {
 
     @Named("offsetDateTimeToString")
     default String offsetDateTimeToString(OffsetDateTime offsetDateTime) {

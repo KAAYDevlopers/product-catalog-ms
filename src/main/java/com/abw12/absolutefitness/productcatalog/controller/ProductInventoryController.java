@@ -21,7 +21,7 @@ public class ProductInventoryController {
     private ProductInventoryService inventoryService;
 
     @GetMapping("/getVariantInventory/{variantId}")
-    public ResponseEntity<?> getVariantInventoryData(@PathVariable Long variantId){
+    public ResponseEntity<?> getVariantInventoryData(@PathVariable String variantId){
         logger.info("Inside getVariantInventoryData rest call: {} " , variantId);
         try{
             return new ResponseEntity<>(inventoryService.getVariantById(variantId), HttpStatus.OK);
@@ -44,7 +44,7 @@ public class ProductInventoryController {
         }
     }
     @GetMapping("/validateAvailability")
-    public ResponseEntity<?> validateAvailability(@RequestBody List<Long> variantIds){
+    public ResponseEntity<?> validateAvailability(@RequestBody List<String> variantIds){
         logger.info("Inside validateAvailability rest call: " );
         try{
             return new ResponseEntity<>(inventoryService.variantsValidation(variantIds), HttpStatus.OK);

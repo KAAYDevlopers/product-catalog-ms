@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="productcategory")
+@Table(name="productcategory" ,schema = "productcatalog")
 public class ProductCategoryDAO {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "product_category_id")
-    private Long productCategoryId;
+    private String productCategoryId;
     @Column(name = "category_name")
     private String categoryName;
     @Column(name="category_description")

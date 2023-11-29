@@ -11,7 +11,7 @@ public class ProductInventoryPersistenceLayer {
     @Autowired
     private ProductInventoryRepository productInventoryRepository;
 
-    public ProductInventoryDAO getVariantData(Long variantId){
+    public ProductInventoryDAO getVariantData(String variantId){
         return productInventoryRepository.getVariantDataById(variantId).orElseThrow(() ->
                 new RuntimeException(String.format("Cannot find variant by Id in Inventory table : %s",variantId)));
     }

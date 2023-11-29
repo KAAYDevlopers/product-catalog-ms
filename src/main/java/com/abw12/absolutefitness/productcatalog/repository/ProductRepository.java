@@ -21,13 +21,13 @@ public interface ProductRepository extends JpaRepository<ProductDAO,Long> {
 //    @Query("SELECT DISTINCT p FROM ProductDAO p LEFT JOIN FETCH p.productVariants WHERE p.productName = :productName")
 //    Optional<ProductDAO> getProductByName(@Param("productName") String productName);
     @Query("SELECT p FROM ProductDAO p WHERE p.productId =:productId")
-    Optional<ProductDAO> getProductById(Long productId);
+    Optional<ProductDAO> getProductById(String productId);
 
     @Query("SELECT p FROM ProductDAO p WHERE p.productName =:productName")
     List<ProductDAO> getProductByName(String productName);
 
     @Query("SELECT p FROM ProductDAO p WHERE p.categoryId =:categoryId")
-    List<ProductDAO> getProductsByCategoryID(Long categoryId);
+    List<ProductDAO> getProductsByCategoryID(String categoryId);
     @Query("SELECT p FROM ProductDAO p WHERE (p.categoryId =:#{#filters.categoryId}) AND " +
             "(:#{#filters.brandName} is null or p.brandName = :#{#filters.brandName}) ")
     List<ProductDAO> getProductByFilters(@Param("filters") ProductFiltersDTO filters);

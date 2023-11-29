@@ -2,13 +2,13 @@ package com.abw12.absolutefitness.productcatalog.mappers;
 
 import com.abw12.absolutefitness.productcatalog.dto.ProductDTO;
 import com.abw12.absolutefitness.productcatalog.entity.ProductDAO;
-import com.abw12.absolutefitness.productcatalog.helper.DateTimeParser;
+import com.abw12.absolutefitness.productcatalog.helper.OffsetDateTimeParser;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
-public interface ProductMapper extends DateTimeParser {
+public interface ProductMapper extends OffsetDateTimeParser {
 
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 

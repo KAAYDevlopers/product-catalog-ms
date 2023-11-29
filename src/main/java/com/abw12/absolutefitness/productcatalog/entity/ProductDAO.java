@@ -11,12 +11,12 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name ="product")
+@Table(name ="product" ,schema = "productcatalog")
 public class ProductDAO {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy= GenerationType.UUID)
     @Column(name = "product_id")
-    private Long productId;
+    private String productId;
     @Column(name = "product_name")
     private String productName;
     @Column(name = "product_description")
@@ -24,7 +24,7 @@ public class ProductDAO {
     @Column(name = "brand_name")
     private String brandName;
     @Column(name= "category_id")
-    private  Long categoryId;
+    private  String categoryId;
 //    @OneToMany(mappedBy = "product" ,cascade = CascadeType.ALL)
 //    private List<ProductVariantDAO> productVariants;
     @Column(name = "product_created_at")

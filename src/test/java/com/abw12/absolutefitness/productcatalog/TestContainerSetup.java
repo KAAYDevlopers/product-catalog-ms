@@ -13,9 +13,11 @@ public abstract class TestContainerSetup {
 
     @Container
     static PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:latest")
-            .withDatabaseName("productcatalog")
+            .withDatabaseName("absolutehealth")
             .withUsername("admin")
-            .withPassword("password");
+            .withPassword("password")
+            .withInitScript("init.sql")
+            .withUrlParam("currentSchema", "productcatalog");
     @DynamicPropertySource
     static void postgresProperties(DynamicPropertyRegistry registry){
         // Set spring.datasource properties to use the dynamic port of the PostgreSQL container

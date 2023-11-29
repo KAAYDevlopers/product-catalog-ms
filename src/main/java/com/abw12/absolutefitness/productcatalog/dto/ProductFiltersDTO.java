@@ -1,5 +1,6 @@
 package com.abw12.absolutefitness.productcatalog.dto;
 
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductFiltersDTO {
-
-    private Long categoryId;
+    @Id
+    private String categoryId;
     private String brandName;
     private String variantName;
     private String variantValue;

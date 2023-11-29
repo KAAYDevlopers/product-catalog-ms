@@ -34,10 +34,10 @@ public class ProductService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
-    public ProductDTO getProductById(Long productId) {
+    public ProductDTO getProductById(String productId) {
         logger.debug("Fetching data for productId: {}" , productId);
         ProductDAO productEntity = persistenceLayer.getProductById(productId);
-        Long categoryId = productEntity.getCategoryId();
+        String categoryId = productEntity.getCategoryId();
         List<ProductVariantDAO> variantsList = persistenceLayer.getVariantsByProductId(productId);
         logger.debug("Fetching category data with categoryId: {}",categoryId);
         ProductCategoryDAO category = persistenceLayer.getCategoryById(categoryId);
@@ -70,8 +70,8 @@ public class ProductService {
 
         return productEntityList.stream()
                 .map(product -> {
-                    Long productId = product.getProductId();
-                    Long categoryId = product.getCategoryId();
+                    String productId = product.getProductId();
+                    String categoryId = product.getCategoryId();
                     logger.debug("Fetching variants data with productId: {}",productId);
                     List<ProductVariantDAO> variantsList = persistenceLayer.getVariantsByProductId(productId);
                     logger.debug("Fetched variants data with productId: {} => {}",productId,variantsList);
@@ -99,13 +99,13 @@ public class ProductService {
                 .toList();
     }
 
-    public List<ProductDTO> getProductsByCategoryId(Long categoryId) {
+    public List<ProductDTO> getProductsByCategoryId(String categoryId) {
         logger.debug("Fetching product data with categoryId: {}",categoryId);
         return persistenceLayer.getProductByCategoryId(categoryId).stream()
                 .map(productDAO -> {
                     ProductDTO product = productMapper.entityToDto(productDAO);
                     logger.debug("Fetched product with categoryId: {} => {}",categoryId,productDAO);
-                    Long productId = productDAO.getProductId();
+                    String  productId = productDAO.getProductId();
                     logger.debug("Fetching variant data with productId: {}",productId);
                     List<ProductVariantDTO> variantList =  persistenceLayer.getVariantsByProductId(productId).stream()
                             .map(variant -> {
@@ -129,7 +129,7 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    public ProductVariantDTO getVariantDataByVariantId(Long variantId){
+    public ProductVariantDTO getVariantDataByVariantId(String variantId){
         logger.info("Fetching variant data with variantId :  {}",variantId);
         ProductVariantDTO variantDTO = productVariantMapper.entityToDto(persistenceLayer.getProductVariantDataById(variantId));
         //fetch inventory data for the variant
@@ -151,7 +151,7 @@ public class ProductService {
         productEntity.setCategoryId(productCategoryDTO.getProductCategoryId()); //to maintain foreign key in product table for categoryId
 
         ProductDTO storedProductResponse = productMapper.entityToDto(persistenceLayer.upsertProductData(productEntity));
-        Long productId = storedProductResponse.getProductId();
+        String productId = storedProductResponse.getProductId();
         List<ProductVariantDTO> productVariantsList = productDTO.getProductVariants().stream()
                 .map(variantDTO -> {
                     ProductVariantDAO tempVariantDao = productVariantMapper.DtoToEntity(variantDTO);
@@ -194,7 +194,7 @@ public class ProductService {
             throw new RuntimeException("productId cannot be NULL");
 
         logger.info("updating product data with productId: {} => {}",productDTO.getProductId(),productDTO);
-        Long productId = productDTO.getProductId();
+        String productId = productDTO.getProductId();
         ProductDAO productEntity = productMapper.DtoToEntity(productDTO);
         if(productDTO.getProductCategory().getProductCategoryId() == null)
             throw new RuntimeException("product category categoryId cannot be NULL");
@@ -249,7 +249,7 @@ public class ProductService {
     }
 
     @Transactional
-    public List<ProductVariantDTO> upsertVariantByProductId(Long productId , List<ProductVariantDTO> variantsList){
+    public List<ProductVariantDTO> upsertVariantByProductId(String productId , List<ProductVariantDTO> variantsList){
         if(productId == null)
             throw new RuntimeException("ProductId cannot be null for a variant");
 

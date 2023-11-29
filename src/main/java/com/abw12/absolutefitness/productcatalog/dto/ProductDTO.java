@@ -1,5 +1,6 @@
 package com.abw12.absolutefitness.productcatalog.dto;
 
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -12,11 +13,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductDTO {
-    private Long productId;
+    @Id
+    private String productId;
     @NotBlank
     private String productName;
     private String productDescription;
-    private Long categoryId;
+    private String categoryId;
     @NotBlank
     private String brandName;
     @NotNull

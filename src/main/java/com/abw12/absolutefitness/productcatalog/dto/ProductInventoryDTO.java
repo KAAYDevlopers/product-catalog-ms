@@ -1,5 +1,6 @@
 package com.abw12.absolutefitness.productcatalog.dto;
 
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,9 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductInventoryDTO {
-
-    private Long productInventoryId;
-    private Long variantId;
+    @Id
+    private String productInventoryId;
+    private String variantId;
     private Long quantity;
     private String sku;
     private Boolean inStockStatus;
