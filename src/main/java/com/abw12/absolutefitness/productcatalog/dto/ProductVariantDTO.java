@@ -16,6 +16,7 @@ public class ProductVariantDTO {
     private String productId;
     private String variantName;
     private String variantValue;
+    private String variantType;
     private String imagePath;
     private BigDecimal buyPrice;
     private BigDecimal onSalePrice;
@@ -24,7 +25,6 @@ public class ProductVariantDTO {
     private String nutritionFacts;
     private String usageDose;
     private String manufacturerDetails;
-    private String variantType;
     private Integer numberOfServings;
     private ProductInventoryDTO inventoryData;
 //    @JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "dd-MM-yyyy")

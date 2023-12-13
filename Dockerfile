@@ -1,4 +1,4 @@
 FROM amazoncorretto:17
-COPY target/*.jar productcatelog-0.0.1-SNAPSHOT.jar
+COPY target/*.jar productcatelog-0.0.1.jar
 EXPOSE 8090
-ENTRYPOINT ["java", "-jar", "productcatelog-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=dev","-jar", "productcatelog-0.0.1.jar"]

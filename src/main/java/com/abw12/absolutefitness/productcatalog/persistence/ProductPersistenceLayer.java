@@ -1,5 +1,6 @@
 package com.abw12.absolutefitness.productcatalog.persistence;
 
+import com.abw12.absolutefitness.productcatalog.advice.InvalidDataRequestException;
 import com.abw12.absolutefitness.productcatalog.dto.ProductFiltersDTO;
 import com.abw12.absolutefitness.productcatalog.entity.ProductCategoryDAO;
 import com.abw12.absolutefitness.productcatalog.entity.ProductDAO;
@@ -26,7 +27,7 @@ public class ProductPersistenceLayer {
     public ProductDAO getProductById(String productId){
 
         return productRepository.getProductById(productId).orElseThrow(() ->
-                new RuntimeException(String.format("Cannot find product by Id : %s",productId)));
+                new InvalidDataRequestException(String.format("Cannot find product by Id : %s",productId)));
     }
     public List<ProductDAO> getProductByName(String productName){
         return productRepository.getProductByName(productName);
@@ -38,7 +39,7 @@ public class ProductPersistenceLayer {
 
     public ProductCategoryDAO getCategoryById(String categoryId){
         return productCategoryRepository.getProductCategory(categoryId).orElseThrow(() ->
-                new RuntimeException(String.format("Cannot find category by categoryId : %s",categoryId)));
+                new InvalidDataRequestException(String.format("Cannot find category by categoryId : %s",categoryId)));
     }
 
     public Optional<ProductCategoryDAO> getCategoryByName(String categoryName){
@@ -63,7 +64,7 @@ public class ProductPersistenceLayer {
 
     public ProductVariantDAO getProductVariantDataById(String variantId){
         return productVariantRepository.getVariantData(variantId).orElseThrow(() ->
-                new RuntimeException(String.format("Cannot find variant by variantId : %s",variantId)));
+                new InvalidDataRequestException(String.format("Cannot find variant by variantId : %s",variantId)));
     }
 
     public List<ProductDAO> getProductsByFilters(ProductFiltersDTO filtersDTO){

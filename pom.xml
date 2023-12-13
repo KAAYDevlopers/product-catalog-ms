@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.abw12.absolutefitness</groupId>
 	<artifactId>productcatalog</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>product catalog</name>
 	<description>crud service to handle product details and its listing</description>
 	<properties>

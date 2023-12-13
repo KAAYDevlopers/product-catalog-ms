@@ -31,4 +31,5 @@ public class ProductDAO {
     private OffsetDateTime productCreatedAt;
     @Column(name = "product_modified_at")
     private OffsetDateTime productModifiedAt;
+
 }
