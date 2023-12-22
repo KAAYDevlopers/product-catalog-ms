@@ -23,8 +23,8 @@ public class ProductInventoryDAO {
     @Column(name="quantity")
     private Long quantity;
     private String sku;
-    @Column(name = "in_stock_status")
-    private Boolean inStockStatus;
+//    @Column(name = "in_stock_status")
+//    private Boolean inStockStatus;
     @Column(name="created_at")
     private OffsetDateTime createdAt;
     @Column(name="modified_at")

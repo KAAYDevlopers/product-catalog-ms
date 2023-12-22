@@ -25,8 +25,6 @@ public class ProductDAO {
     private String brandName;
     @Column(name= "category_id")
     private  String categoryId;
-//    @OneToMany(mappedBy = "product" ,cascade = CascadeType.ALL)
-//    private List<ProductVariantDAO> productVariants;
     @Column(name = "product_created_at")
     private OffsetDateTime productCreatedAt;
     @Column(name = "product_modified_at")
