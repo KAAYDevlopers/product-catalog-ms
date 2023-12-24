@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,6 +18,6 @@ public class ProductFiltersDTO {
     private String variantValue;
     private Integer numberOfServings;
     private String variantType;
-    private Double minOnSalePrice;
-    private Double maxOnSalePrice;
+    private BigDecimal minOnSalePrice;
+    private BigDecimal maxOnSalePrice;
 }

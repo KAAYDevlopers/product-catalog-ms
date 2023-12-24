@@ -1,0 +1,21 @@
+app:
+  replicas: 1
+  name: product-catalog-ms
+  configPath: /app/config
+  port: 8090
+
+
+configMap:
+  name: product-catalog-config
+
+image:
+  repository: abw12/productcatalog-ms
+  tag: v1
+
+
+postgres:
+  username: postgres
+  password: password
+  host: postgres-service
+  port: 5432
+  db: absolutehealth
