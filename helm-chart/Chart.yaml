@@ -1,0 +1,4 @@
+apiVersion: v2
+name: product-catalog-ms
+description: Helm chart for product-catalog-ms
+version: 1.0.0-SNAPSHOT

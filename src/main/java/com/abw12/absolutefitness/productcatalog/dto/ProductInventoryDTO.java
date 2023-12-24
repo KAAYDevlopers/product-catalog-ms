@@ -14,7 +14,6 @@ public class ProductInventoryDTO {
     private String variantId;
     private Long quantity;
     private String sku;
-//    private Boolean inStockStatus;
     private String createdAt;
     private String modifiedAt;
 }
