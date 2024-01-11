@@ -24,12 +24,12 @@ public interface ProductRepository extends JpaRepository<ProductDAO,Long> {
     Optional<ProductDAO> getProductById(String productId);
 
     @Query("SELECT p FROM ProductDAO p WHERE p.productName =:productName")
-    List<ProductDAO> getProductByName(String productName);
+    Optional<List<ProductDAO>> getProductByName(String productName);
 
     @Query("SELECT p FROM ProductDAO p WHERE p.categoryId =:categoryId")
-    List<ProductDAO> getProductsByCategoryID(String categoryId);
+    Optional<List<ProductDAO>> getProductsByCategoryID(String categoryId);
     @Query("SELECT p FROM ProductDAO p WHERE (p.categoryId =:#{#filters.categoryId}) AND " +
-            "(:#{#filters.brandName} is null or p.brandName = :#{#filters.brandName}) ")
+            "(:#{#filters.brandName} is null or p.brandName IN :#{#filters.brandName}) ")
     List<ProductDAO> getProductByFilters(@Param("filters") ProductFiltersDTO filters);
 
 //    Optional<Object>

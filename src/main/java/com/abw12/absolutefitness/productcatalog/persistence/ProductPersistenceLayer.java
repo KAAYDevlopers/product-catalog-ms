@@ -9,6 +9,8 @@ import com.abw12.absolutefitness.productcatalog.repository.ProductCategoryReposi
 import com.abw12.absolutefitness.productcatalog.repository.ProductRepository;
 import com.abw12.absolutefitness.productcatalog.repository.ProductVariantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,17 +26,22 @@ public class ProductPersistenceLayer {
     @Autowired
     private ProductCategoryRepository productCategoryRepository;
 
-    public ProductDAO getProductById(String productId){
+    public Page<ProductDAO> listProductData(PageRequest pageRequest){
+        return productRepository.findAll(pageRequest);
+    }
 
+    public ProductDAO getProductById(String productId){
         return productRepository.getProductById(productId).orElseThrow(() ->
-                new InvalidDataRequestException(String.format("Cannot find product by Id : %s",productId)));
+                new InvalidDataRequestException(String.format("Cannot find product by productId=%s",productId)));
     }
     public List<ProductDAO> getProductByName(String productName){
-        return productRepository.getProductByName(productName);
+        return productRepository.getProductByName(productName).orElseThrow(() ->
+                new InvalidDataRequestException(String.format("Cannot find product by productName=%s",productName)));
     }
 
     public List<ProductVariantDAO> getVariantsByProductId(String productId){
-        return productVariantRepository.getVariantsByProductId(productId);
+        return productVariantRepository.getVariantsByProductId(productId).orElseThrow(() ->
+                new InvalidDataRequestException(String.format("Cannot find any product variant by productId=%s",productId)));
     }
 
     public ProductCategoryDAO getCategoryById(String categoryId){
@@ -59,7 +66,8 @@ public class ProductPersistenceLayer {
     }
 
     public List<ProductDAO> getProductByCategoryId(String categoryId){
-        return productRepository.getProductsByCategoryID(categoryId);
+        return productRepository.getProductsByCategoryID(categoryId).orElseThrow(() ->
+                new InvalidDataRequestException(String.format("Cannot find product by categoryId : %s",categoryId)));
     }
 
     public ProductVariantDAO getProductVariantDataById(String variantId){

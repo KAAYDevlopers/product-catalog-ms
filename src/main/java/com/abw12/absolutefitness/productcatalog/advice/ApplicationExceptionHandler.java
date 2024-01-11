@@ -23,7 +23,6 @@ public class ApplicationExceptionHandler {
         return errorMap;
     }
 
-
     @ExceptionHandler(ConversionFailedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleConversion(RuntimeException ex) {
@@ -37,8 +36,8 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler(InvalidDataRequestException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleInvalidRequestData(InvalidDataRequestException ex){
-        return new ResponseEntity<>(ex.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
     }
 }

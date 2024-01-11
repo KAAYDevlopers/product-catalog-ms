@@ -21,9 +21,6 @@ public class ProductVariantDAO {
     private String variantId;
     @Column(name="product_id")
     private String productId;
-    //    @ManyToOne
-//    @JoinColumn(name="product_id")
-//    private ProductDAO product;
     @Column(name = "variant_name")
     private String variantName;
     @Column(name = "variant_value")

@@ -1,5 +1,6 @@
 package com.abw12.absolutefitness.productcatalog.service;
 
+import com.abw12.absolutefitness.productcatalog.advice.InvalidDataRequestException;
 import com.abw12.absolutefitness.productcatalog.dto.*;
 import com.abw12.absolutefitness.productcatalog.entity.ProductCategoryDAO;
 import com.abw12.absolutefitness.productcatalog.entity.ProductDAO;
@@ -12,6 +13,8 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,17 +37,40 @@ public class ProductService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
+    public Page<ProductDTO> ListProduct(PageRequest pageRequest){
+        logger.info("Listing all the product and their variant data");
+        Page<ProductDAO> products = persistenceLayer.listProductData(pageRequest);
+        //map over each product and get its variant/category data
+        Page<ProductDTO> response = products.map(productDAO -> {
+            ProductDTO productDTO = productMapper.entityToDto(productDAO);
+            //fetch product category data
+            ProductCategoryDAO categoryData = persistenceLayer.getCategoryById(productDTO.getCategoryId());
+            ProductCategoryDTO productCategoryDTO = productCategoryMapper.entityToDto(categoryData);
+
+            //fetch product variant list
+            List<ProductVariantDAO> variants = persistenceLayer.getVariantsByProductId(productDTO.getProductId());
+            List<ProductVariantDTO> variantsDtoList = variants.stream().map(productVariantDAO -> productVariantMapper.entityToDto(productVariantDAO)).toList();
+
+            productDTO.setProductVariants(variantsDtoList);
+            productDTO.setProductCategory(productCategoryDTO);
+            return productDTO;
+        });
+        logger.info("List Product Response :: totalElements : {} | totalPages : {} | numberOfElements: {} ",
+                response.getTotalElements(),response.getTotalPages(),response.getNumberOfElements());
+        return response;
+    }
+
     public ProductDTO getProductById(String productId) {
-        logger.debug("Fetching data for productId: {}" , productId);
+        logger.info("Fetching data for productId: {}" , productId);
         ProductDAO productEntity = persistenceLayer.getProductById(productId);
         String categoryId = productEntity.getCategoryId();
         List<ProductVariantDAO> variantsList = persistenceLayer.getVariantsByProductId(productId);
-        logger.debug("Fetching category data with categoryId: {}",categoryId);
+        logger.info("Fetching category data with categoryId: {}",categoryId);
         ProductCategoryDAO category = persistenceLayer.getCategoryById(categoryId);
 
 
         ProductDTO productDTO = productMapper.entityToDto(productEntity);
-        logger.debug("Fetched data for productId: {} => {}" , productId,productDTO);
+        logger.info("Fetched data for productId: {} => {}" , productId,productDTO);
         List<ProductVariantDTO> pVariantDTOList = variantsList.stream()
                 .map(variant -> {
                     ProductVariantDTO variantDTO = productVariantMapper.entityToDto(variant);
@@ -53,9 +79,9 @@ public class ProductService {
                     return variantDTO;
                 })
                 .toList();
-        logger.debug("Fetched variants data for productId: {} => {}",productId,pVariantDTOList);
+        logger.info("Fetched variants data for productId: {} => {}",productId,pVariantDTOList);
         ProductCategoryDTO pCategory = productCategoryMapper.entityToDto(category);
-        logger.debug("Fetched category data with categoryId: {} => {}",categoryId,pCategory);
+        logger.info("Fetched category data with categoryId: {} => {}",categoryId,pCategory);
         productDTO.setProductVariants(pVariantDTOList);
         productDTO.setProductCategory(pCategory);
         logger.info("Fetched product data with productId:{} =>{}",productId,productDTO);
@@ -64,29 +90,29 @@ public class ProductService {
 
     public List<ProductDTO> getProductByName(String productName) {
 
-        logger.debug("Fetching product data with productName: {}",productName);
+        logger.info("Fetching product data with productName: {}",productName);
         List<ProductDAO> productEntityList = persistenceLayer.getProductByName(productName);
-        logger.debug("Fetched product data with productName: {} => {}",productName,productEntityList);
+        logger.info("Fetched product data with productName: {} => {}",productName,productEntityList);
 
         return productEntityList.stream()
                 .map(product -> {
                     String productId = product.getProductId();
                     String categoryId = product.getCategoryId();
-                    logger.debug("Fetching variants data with productId: {}",productId);
+                    logger.info("Fetching variants data with productId: {}",productId);
                     List<ProductVariantDAO> variantsList = persistenceLayer.getVariantsByProductId(productId);
-                    logger.debug("Fetched variants data with productId: {} => {}",productId,variantsList);
+                    logger.info("Fetched variants data with productId: {} => {}",productId,variantsList);
 
-                    logger.debug("Fetching category data for productId: {} with categoryId: {}",productId,categoryId);
+                    logger.info("Fetching category data for productId: {} with categoryId: {}",productId,categoryId);
                     ProductCategoryDAO category = persistenceLayer.getCategoryById(categoryId);
-                    logger.debug("Fetched category data for productId: {} with categoryId: {} => {}",productId,categoryId,category);
+                    logger.info("Fetched category data for productId: {} with categoryId: {} => {}",productId,categoryId,category);
                     ProductDTO productDTO = productMapper.entityToDto(product);
 
                     List<ProductVariantDTO> pVariantDTOList = variantsList.stream()
                             .map(variant -> {
                                 ProductVariantDTO variantDTO = productVariantMapper.entityToDto(variant);
-                                logger.debug("Fetching inventory data with variantId: {}",variant.getVariantId());
+                                logger.info("Fetching inventory data with variantId: {}",variant.getVariantId());
                                 ProductInventoryDTO inventoryDTO = inventoryService.getVariantById(variantDTO.getVariantId());
-                                logger.debug("Fetched inventory data with variantId: {} => {} ",variant.getVariantId(),inventoryDTO);
+                                logger.info("Fetched inventory data with variantId: {} => {} ",variant.getVariantId(),inventoryDTO);
                                 variantDTO.setInventoryData(inventoryDTO);
                                 return variantDTO;
                             })
@@ -100,28 +126,28 @@ public class ProductService {
     }
 
     public List<ProductDTO> getProductsByCategoryId(String categoryId) {
-        logger.debug("Fetching product data with categoryId: {}",categoryId);
+        logger.info("Fetching product data with categoryId: {}",categoryId);
         return persistenceLayer.getProductByCategoryId(categoryId).stream()
                 .map(productDAO -> {
                     ProductDTO product = productMapper.entityToDto(productDAO);
-                    logger.debug("Fetched product with categoryId: {} => {}",categoryId,productDAO);
+                    logger.info("Fetched product with categoryId: {} => {}",categoryId,productDAO);
                     String  productId = productDAO.getProductId();
-                    logger.debug("Fetching variant data with productId: {}",productId);
+                    logger.info("Fetching variant data with productId: {}",productId);
                     List<ProductVariantDTO> variantList =  persistenceLayer.getVariantsByProductId(productId).stream()
                             .map(variant -> {
                                 ProductVariantDTO variantDTO = productVariantMapper.entityToDto(variant);
-                                logger.debug("Fetching inventory data with variantId: {}",variantDTO.getVariantId());
+                                logger.info("Fetching inventory data with variantId: {}",variantDTO.getVariantId());
                                 ProductInventoryDTO inventoryDTO = inventoryService.getVariantById(variantDTO.getVariantId());
-                                logger.debug("Fetched inventory data with variantId: {} => {} ",variantDTO.getVariantId(),inventoryDTO);
+                                logger.info("Fetched inventory data with variantId: {} => {} ",variantDTO.getVariantId(),inventoryDTO);
                                 variantDTO.setInventoryData(inventoryDTO);
                                 return variantDTO;
                             })
                             .toList();
-                    logger.debug("Fetched variants data with productId: {} => {}",productId,variantList);
+                    logger.info("Fetched variants data with productId: {} => {}",productId,variantList);
 
-                    logger.debug("Fetching category data for productId: {} with categoryId: {}",productId,categoryId);
+                    logger.info("Fetching category data for productId: {} with categoryId: {}",productId,categoryId);
                     ProductCategoryDTO productCategoryDTO = productCategoryMapper.entityToDto(persistenceLayer.getCategoryById(productDAO.getCategoryId()));
-                    logger.debug("Fetched category data for productId: {} with categoryId: {} => {}",productId,categoryId,productCategoryDTO);
+                    logger.info("Fetched category data for productId: {} with categoryId: {} => {}",productId,categoryId,productCategoryDTO);
                     product.setProductCategory(productCategoryDTO);
                     product.setProductVariants(variantList);
                     return product;
@@ -133,11 +159,11 @@ public class ProductService {
         logger.info("Fetching variant data with variantId :  {}",variantId);
         ProductVariantDTO variantDTO = productVariantMapper.entityToDto(persistenceLayer.getProductVariantDataById(variantId));
         //fetch inventory data for the variant
-        logger.debug("Fetching Inventory data with variantId: {}",variantId);
+        logger.info("Fetching Inventory data with variantId: {}",variantId);
         ProductInventoryDTO inventoryDTO = inventoryService.getVariantById(variantId);
-        logger.debug("Fetched Inventory data with variantId: {} => {}",variantId,inventoryDTO);
+        logger.info("Fetched Inventory data with variantId: {} => {}",variantId,inventoryDTO);
         variantDTO.setInventoryData(inventoryDTO);
-        logger.debug("Fetched variant data with variantId : {} => {}",variantId,variantDTO);
+        logger.info("Fetched variant data with variantId : {} => {}",variantId,variantDTO);
         return variantDTO;
     }
     @Transactional
@@ -150,7 +176,7 @@ public class ProductService {
         ProductCategoryDTO productCategoryDTO = checkIfCategoryExist(productCategory.getCategoryName(), productCategory);
         productEntity.setCategoryId(productCategoryDTO.getProductCategoryId()); //to maintain foreign key in product table for categoryId
 
-        ProductDTO storedProductResponse = productMapper.entityToDto(persistenceLayer.upsertProductData(productEntity));
+        ProductDTO storedProductResponse = productMapper.entityToDto(persistenceLayer.  upsertProductData(productEntity));
         String productId = storedProductResponse.getProductId();
         List<ProductVariantDTO> productVariantsList = productDTO.getProductVariants().stream()
                 .map(variantDTO -> {
@@ -159,12 +185,12 @@ public class ProductService {
                     //store variant info in db
                     ProductVariantDAO storedVariantData = persistenceLayer.upsertVariant(tempVariantDao);
                     ProductVariantDTO response = productVariantMapper.entityToDto(storedVariantData);
-                    logger.debug("variant data with productId:{} stored in db : {}" ,productId,response);
+                    logger.info("variant data with productId:{} stored in db : {}" ,productId,response);
                     //taking variantId after storing the variant in db
                     variantDTO.getInventoryData().setVariantId(response.getVariantId());
                     //save inventory data for each variant in the list
                     ProductInventoryDTO storedInventoryData = inventoryService.updateVariantInventoryData(variantDTO.getInventoryData());
-                    logger.debug("inventory data stored with productId: {} => {}",productId,storedInventoryData);
+                    logger.info("inventory data stored with productId: {} => {}",productId,storedInventoryData);
                     response.setInventoryData(storedInventoryData);
                     return response;
                 })
@@ -179,11 +205,11 @@ public class ProductService {
     public ProductCategoryDTO checkIfCategoryExist(String categoryName,ProductCategoryDAO productCategory){
         Optional<ProductCategoryDAO> categoryObj = persistenceLayer.getCategoryByName(categoryName);
         if(categoryObj.isPresent()){
-            logger.debug("product category already exist with categoryId: {}",categoryObj.get().getProductCategoryId());
+            logger.info("product category already exist with categoryId: {}",categoryObj.get().getProductCategoryId());
             return productCategoryMapper.entityToDto(categoryObj.get());
         }else{
             ProductCategoryDTO newCategoryData = productCategoryMapper.entityToDto(persistenceLayer.upsertCategoryData(productCategory));
-            logger.debug("created new category with categoryId: {}",newCategoryData.getProductCategoryId());
+            logger.info("created new category with categoryId: {}",newCategoryData.getProductCategoryId());
             return newCategoryData;
         }
     }
@@ -202,9 +228,9 @@ public class ProductService {
         ProductCategoryDAO productCategoryEntity = productCategoryMapper.DtoToEntity(productDTO.getProductCategory());
 
         ProductDTO productResponse =productMapper.entityToDto(persistenceLayer.upsertProductData(productEntity));
-        logger.debug("updated product data: {}",productResponse);
+        logger.info("updated product data: {}",productResponse);
         ProductCategoryDTO productCategoryResponse = productCategoryMapper.entityToDto(persistenceLayer.upsertCategoryData(productCategoryEntity));
-        logger.debug("updated category data with productId:{} => {}",productId,productCategoryResponse);
+        logger.info("updated category data with productId:{} => {}",productId,productCategoryResponse);
         List<ProductVariantDTO> productVariantsResponse = productDTO.getProductVariants().stream()
                 .map(variantDTO -> {
                     ProductVariantDAO tempVariantDao = productVariantMapper.DtoToEntity(variantDTO);
@@ -212,12 +238,12 @@ public class ProductService {
                     //store variant info in db
                     ProductVariantDAO storedVariantData = persistenceLayer.upsertVariant(tempVariantDao);
                     ProductVariantDTO response = productVariantMapper.entityToDto(storedVariantData);
-                    logger.debug("variant data updated with productId:{} => {}",productId,response);
+                    logger.info("variant data updated with productId:{} => {}",productId,response);
                     //taking variantId after storing the variant in db
                     variantDTO.getInventoryData().setVariantId(response.getVariantId());
                     //save inventory data for each variant in the list
                     ProductInventoryDTO storedInventoryData = inventoryService.updateVariantInventoryData(variantDTO.getInventoryData());
-                    logger.debug("Inventory data updated for variant:{} => {}",response.getVariantId(),storedInventoryData);
+                    logger.info("Inventory data updated for variant:{} => {}",response.getVariantId(),storedInventoryData);
                     response.setInventoryData(storedInventoryData);
                     return response;
                 })
@@ -230,7 +256,7 @@ public class ProductService {
 
     public List<ProductDTO> filterProduct(ProductFiltersDTO filtersDTO){
         if(filtersDTO.getCategoryId() == null)
-            throw new RuntimeException("categoryId cannot be NULL");
+            throw new InvalidDataRequestException("categoryId cannot be NULL");
         //product list for current category
         List<ProductDTO> productList = persistenceLayer.getProductsByFilters(filtersDTO).stream()
                 .map(productDAO -> productMapper.entityToDto(productDAO))
@@ -251,7 +277,7 @@ public class ProductService {
     @Transactional
     public List<ProductVariantDTO> upsertVariantByProductId(String productId , List<ProductVariantDTO> variantsList){
         if(productId == null)
-            throw new RuntimeException("ProductId cannot be null for a variant");
+            throw new InvalidDataRequestException("ProductId cannot be null for a variant");
 
         logger.info("insert/update variants data with productId:{} ",productId);
         return variantsList.stream()
@@ -266,7 +292,7 @@ public class ProductService {
                     variantDto.getInventoryData().setVariantId(response.getVariantId());
                     //save inventory data for each variant in the list
                     ProductInventoryDTO storedInventoryData = inventoryService.updateVariantInventoryData(variantDto.getInventoryData());
-                    logger.debug("stored inventory data with variantId:{} => {}",response.getVariantId(),storedInventoryData);
+                    logger.info("stored inventory data with variantId:{} => {}",response.getVariantId(),storedInventoryData);
                     response.setInventoryData(storedInventoryData);
                     return response;
                 })

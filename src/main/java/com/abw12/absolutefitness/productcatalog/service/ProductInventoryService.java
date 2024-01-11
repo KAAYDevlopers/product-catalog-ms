@@ -1,5 +1,6 @@
 package com.abw12.absolutefitness.productcatalog.service;
 
+import com.abw12.absolutefitness.productcatalog.advice.InvalidDataRequestException;
 import com.abw12.absolutefitness.productcatalog.constants.CommonConstants;
 import com.abw12.absolutefitness.productcatalog.dto.InventoryValidationReq;
 import com.abw12.absolutefitness.productcatalog.dto.InventoryValidationRes;
@@ -28,7 +29,7 @@ public class ProductInventoryService {
         return inventoryMapper.entityToDto(pInventoryPersistenceLayer.getVariantData(variantId));
     }
     public ProductInventoryDTO updateVariantInventoryData(ProductInventoryDTO inventoryDto){
-        if(StringUtils.isEmpty(inventoryDto.getVariantId())) throw new RuntimeException("Invalid request VariantId cannot be Null/Empty..");
+        if(StringUtils.isEmpty(inventoryDto.getVariantId())) throw new InvalidDataRequestException("Invalid request VariantId cannot be Null/Empty..");
         String variantId = inventoryDto.getVariantId();
         logger.info("Saving inventory data with variantId :: {} => {}",variantId,inventoryDto);
         ProductInventoryDAO productInventoryDAO = pInventoryPersistenceLayer.updateVariantInventoryData(inventoryMapper.DtoToEntity(inventoryDto));
@@ -41,11 +42,12 @@ public class ProductInventoryService {
         logger.info("Checking variant inventory status with variantId :: {}",reqData.getVariantId());
         InventoryValidationRes response = new InventoryValidationRes();
         ProductInventoryDAO inventoryData = pInventoryPersistenceLayer.getVariantData(variantId);
-        String availabilityStatus = reqData.getQuantityRequested() < inventoryData.getQuantity()
+        String availabilityStatus = reqData.getQuantityRequested() <= inventoryData.getQuantity()
                 ? CommonConstants.IN_STOCK
                 : CommonConstants.OUT_OF_STOCK;
 
         response.setVariantId(reqData.getVariantId());
+        response.setVariantInventoryId(inventoryData.getVariantInventoryId());
         response.setQuantityRequested(reqData.getQuantityRequested());
         response.setQuantityAvailable(inventoryData.getQuantity());
         response.setStockStatus(availabilityStatus);

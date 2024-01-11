@@ -14,7 +14,7 @@ public class ProductInventoryPersistenceLayer {
 
     public ProductInventoryDAO getVariantData(String variantId){
         return productInventoryRepository.getVariantDataById(variantId).orElseThrow(() ->
-                new InvalidDataRequestException(String.format("Cannot find variant by Id in Inventory table : %s",variantId)));
+                new InvalidDataRequestException(String.format("Cannot find variant by variantId=%s in Inventory",variantId)));
     }
     public ProductInventoryDAO updateVariantInventoryData(ProductInventoryDAO inventoryData){
         return  productInventoryRepository.save(inventoryData);
