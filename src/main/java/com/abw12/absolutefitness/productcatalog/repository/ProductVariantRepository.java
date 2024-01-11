@@ -14,11 +14,11 @@ import java.util.Optional;
 public interface ProductVariantRepository  extends JpaRepository<ProductVariantDAO,Long> {
 
     @Query("SELECT v FROM ProductVariantDAO v WHERE v.productId =:productId")
-    List<ProductVariantDAO> getVariantsByProductId(@Param("productId") String productId);
+    Optional<List<ProductVariantDAO>> getVariantsByProductId(@Param("productId") String productId);
     @Query("SELECT v FROM ProductVariantDAO v WHERE " +
             "(v.productId =:productId) AND "+
-            "(:#{#filters.variantName} is null or v.variantName = :#{#filters.variantName}) AND" +
-            "(:#{#filters.variantValue} is null or v.variantValue = :#{#filters.variantValue}) AND" +
+            "(:#{#filters.variantName} is null or v.variantName IN :#{#filters.variantName}) AND" +
+            "(:#{#filters.variantValue} is null or v.variantValue IN :#{#filters.variantValue}) AND" +
             "(:#{#filters.numberOfServings} is null or v.numberOfServings = :#{#filters.numberOfServings}) AND" +
             "(:#{#filters.variantType} is null or v.variantType = :#{#filters.variantType}) AND" +
             "(:#{#filters.minOnSalePrice} is null or v.onSalePrice >= :#{#filters.minOnSalePrice}) AND" +

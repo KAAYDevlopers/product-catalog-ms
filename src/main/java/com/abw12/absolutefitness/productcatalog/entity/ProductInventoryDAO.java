@@ -16,15 +16,13 @@ public class ProductInventoryDAO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "product_inventory_id")
-    private String productInventoryId;
+    @Column(name = "variant_inventory_id")
+    private String variantInventoryId;
     @Column(name="variant_id")
     private String variantId;
     @Column(name="quantity")
     private Long quantity;
     private String sku;
-//    @Column(name = "in_stock_status")
-//    private Boolean inStockStatus;
     @Column(name="created_at")
     private OffsetDateTime createdAt;
     @Column(name="modified_at")

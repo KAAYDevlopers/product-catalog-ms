@@ -10,6 +10,11 @@ data:
         username: {{ .Values.postgres.username }}
         password: {{ .Values.postgres.password }}
         driver-class-name: org.postgresql.Driver
+        hikari:
+          maximum-pool-size: 10
+          minimum-idle: 5
+          idle-timeout: 300000
+          max-lifetime: 1800000
       jpa:
         show-sql: true
         properties:

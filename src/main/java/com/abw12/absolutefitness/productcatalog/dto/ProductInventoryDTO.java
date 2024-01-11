@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProductInventoryDTO {
     @Id
-    private String productInventoryId;
+    private String variantInventoryId;
     private String variantId;
     private Long quantity;
     private String sku;
