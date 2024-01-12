@@ -13,6 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class ProductInventoryService {
@@ -28,6 +31,7 @@ public class ProductInventoryService {
         logger.info("Getting inventory data with variantId :: {}",variantId);
         return inventoryMapper.entityToDto(pInventoryPersistenceLayer.getVariantData(variantId));
     }
+    @Transactional
     public ProductInventoryDTO updateVariantInventoryData(ProductInventoryDTO inventoryDto){
         if(StringUtils.isEmpty(inventoryDto.getVariantId())) throw new InvalidDataRequestException("Invalid request VariantId cannot be Null/Empty..");
         String variantId = inventoryDto.getVariantId();
@@ -53,5 +57,12 @@ public class ProductInventoryService {
         response.setStockStatus(availabilityStatus);
         logger.info("variant inventory status with variantId :: {} => {} :: available quantity = {}",variantId,availabilityStatus,inventoryData.getQuantity());
         return response;
+    }
+
+    public Integer deleteInventoryData(List<String> variantIdList){
+        logger.info("Deleting inventory data for all variant in variantIdList={}",variantIdList);
+        Integer deleteCount = pInventoryPersistenceLayer.deleteVariantInventoryByVariantId(variantIdList);
+        logger.info("Deleted inventory data for all variant in variantIdList={}, delete count={}",variantIdList,deleteCount);
+        return deleteCount;
     }
 }

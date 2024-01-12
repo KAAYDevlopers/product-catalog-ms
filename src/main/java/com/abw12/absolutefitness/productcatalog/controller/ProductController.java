@@ -129,6 +129,28 @@ public class ProductController {
         }
     }
 
+    @DeleteMapping("/deleteProduct/{productId}")
+    public ResponseEntity<?> deleteProductByProductId(@PathVariable String productId) {
+        logger.info("Inside deleteProductByProductId rest call");
+        try {
+            return new ResponseEntity<>(productService.deleteProductByProductId(productId),HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Exception while deleting the product with productId:{} :: Error Message= {}",productId,e.getMessage());
+            throw e;
+        }
+    }
+
+    @DeleteMapping("/deleteVariants")
+    public ResponseEntity<?> deleteAllVariants(@RequestBody List<String> variantIdList) {
+        logger.info("Inside deleteAllVariants rest call");
+        try {
+            return new ResponseEntity<>(productService.deleteVariantByVariantId(variantIdList),HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Exception while deleting the variant :: Error Message= {}",e.getMessage());
+            throw e;
+        }
+    }
+
 
 
 

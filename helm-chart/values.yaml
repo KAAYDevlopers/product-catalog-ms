@@ -10,7 +10,7 @@ configMap:
 
 image:
   repository: abw12/product-catalog-ms
-  tag: v2
+  tag: v1
 
 
 postgres:

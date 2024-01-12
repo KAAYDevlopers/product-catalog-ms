@@ -6,6 +6,8 @@ import com.abw12.absolutefitness.productcatalog.repository.ProductInventoryRepos
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class ProductInventoryPersistenceLayer {
 
@@ -18,6 +20,11 @@ public class ProductInventoryPersistenceLayer {
     }
     public ProductInventoryDAO updateVariantInventoryData(ProductInventoryDAO inventoryData){
         return  productInventoryRepository.save(inventoryData);
+    }
+
+    public Integer deleteVariantInventoryByVariantId(List<String> variantIdList){
+        return productInventoryRepository.deleteVariantInventoryByVariantId(variantIdList).orElseThrow(() ->
+                new InvalidDataRequestException("Error while deleting inventory data for variants"));
     }
 
 }

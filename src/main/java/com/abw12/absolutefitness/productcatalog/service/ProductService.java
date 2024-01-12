@@ -9,13 +9,14 @@ import com.abw12.absolutefitness.productcatalog.mappers.ProductCategoryMapper;
 import com.abw12.absolutefitness.productcatalog.mappers.ProductMapper;
 import com.abw12.absolutefitness.productcatalog.mappers.ProductVariantMapper;
 import com.abw12.absolutefitness.productcatalog.persistence.ProductPersistenceLayer;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +38,7 @@ public class ProductService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
+    @Transactional(readOnly = true)
     public Page<ProductDTO> ListProduct(PageRequest pageRequest){
         logger.info("Listing all the product and their variant data");
         Page<ProductDAO> products = persistenceLayer.listProductData(pageRequest);
@@ -60,6 +62,7 @@ public class ProductService {
         return response;
     }
 
+    @Transactional(readOnly = true)
     public ProductDTO getProductById(String productId) {
         logger.info("Fetching data for productId: {}" , productId);
         ProductDAO productEntity = persistenceLayer.getProductById(productId);
@@ -87,7 +90,7 @@ public class ProductService {
         logger.info("Fetched product data with productId:{} =>{}",productId,productDTO);
         return  productDTO;
     }
-
+    @Transactional(readOnly = true)
     public List<ProductDTO> getProductByName(String productName) {
 
         logger.info("Fetching product data with productName: {}",productName);
@@ -125,6 +128,7 @@ public class ProductService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<ProductDTO> getProductsByCategoryId(String categoryId) {
         logger.info("Fetching product data with categoryId: {}",categoryId);
         return persistenceLayer.getProductByCategoryId(categoryId).stream()
@@ -254,6 +258,7 @@ public class ProductService {
         return productResponse;
     }
 
+    @Transactional(readOnly = true)
     public List<ProductDTO> filterProduct(ProductFiltersDTO filtersDTO){
         if(filtersDTO.getCategoryId() == null)
             throw new InvalidDataRequestException("categoryId cannot be NULL");
@@ -298,6 +303,35 @@ public class ProductService {
                 })
                 .peek(storedVariantsList -> logger.info("completed : variants list stored"))
                 .toList();
+    }
+    @Transactional
+    public DeleteOperationResponse deleteProductByProductId(String productId){
+        logger.info("Starting the cascade delete process for the product with productId={} ",productId);
+        //retrieve all variants for the product
+        List<ProductVariantDAO> variantList = persistenceLayer.getVariantsByProductId(productId);
+        List<String> variantIdList = variantList.stream().map(ProductVariantDAO::getVariantId).toList();
+        //delete inventory data for variants
+        Integer inventoryDelCount = inventoryService.deleteInventoryData(variantIdList);
+        //then delete the variant record from the variant table
+        logger.info("Deleting all variants having productId={}",productId);
+        Integer variantDelCount = persistenceLayer.deleteVariantsByProductId(productId);
+        logger.info("Deleted total {} variants having productId={}",variantDelCount,productId);
+        //finally delete the product itself
+        logger.info("delete the product itself with productId={}",productId);
+        Integer productDelCount = persistenceLayer.deleteProduct(productId);
+        logger.info("Deleted total {} product having productId={}",productDelCount,productId);
+        return new DeleteOperationResponse(HttpStatus.OK.getReasonPhrase(), String .format("Successfully Deleted the Product with productId=%s",productId));
+    }
+
+    @Transactional
+    public DeleteOperationResponse deleteVariantByVariantId(List<String> variantIdList){
+        logger.info("Starting the cascade delete process for all the variants requested :: {}",variantIdList);
+        //first delete inventory data
+        inventoryService.deleteInventoryData(variantIdList);
+        //then delete the variant itself
+        Integer variantDelCount = persistenceLayer.deleteVariantsInVariantIdList(variantIdList);
+        logger.info("Deleted total {} variants",variantDelCount);
+        return new DeleteOperationResponse(HttpStatus.OK.getReasonPhrase(), "Successfully Deleted all the variants.");
     }
 
 }

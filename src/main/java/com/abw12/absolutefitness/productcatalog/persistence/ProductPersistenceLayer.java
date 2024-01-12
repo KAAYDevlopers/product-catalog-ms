@@ -89,4 +89,20 @@ public class ProductPersistenceLayer {
     public ProductVariantDAO upsertVariant(ProductVariantDAO variant){
         return productVariantRepository.save(variant);
     }
+
+    public Integer deleteProduct(String productId){
+        return productRepository.deleteProductById(productId).orElseThrow(() ->
+                new InvalidDataRequestException(String.format("Error while deleting a product by productId = %s",productId)));
+    }
+
+    public Integer deleteVariantsByProductId(String productId){
+        return productVariantRepository.deleteVariantsByProductId(productId).orElseThrow(() ->
+                new InvalidDataRequestException(String.format("Error while deleting all variants for product with productId = %s",productId)));
+    }
+
+    public Integer deleteVariantsInVariantIdList(List<String> variantIdList){
+        return productVariantRepository.deleteVariantsInVariantIdList(variantIdList).orElseThrow(() ->
+                new InvalidDataRequestException(String.format("Error while deleting variants from variantIdList=%s",variantIdList)));
+    }
+
 }
