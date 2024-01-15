@@ -24,6 +24,11 @@ data:
           ddl-auto: update
     server:
       port: {{ .Values.app.port }}
+    spaces:
+      access_key_id: {{ .Values.spaces.access_key_id }}
+      secret_key: {{ .Values.spaces.secret_key }}
+      region: {{ .Values.spaces.region }}
+      baseUrl: {{ .Values.spaces.baseUrl }}
     springdoc:
       api-docs:
         path: /v3/productcatalog-docs

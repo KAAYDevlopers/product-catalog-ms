@@ -6,6 +6,7 @@ import com.abw12.absolutefitness.productcatalog.dto.ProductFiltersDTO;
 import com.abw12.absolutefitness.productcatalog.dto.ProductVariantDTO;
 import com.abw12.absolutefitness.productcatalog.mappers.ProductFilterDTOMapper;
 import com.abw12.absolutefitness.productcatalog.service.ProductService;
+import com.abw12.absolutefitness.productcatalog.service.StorageService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,8 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+    @Autowired
+    private StorageService storageService;
 
     @GetMapping("/listproducts")
     public ResponseEntity<?> listProducts(@RequestParam(defaultValue = "0") int page,
@@ -151,7 +154,16 @@ public class ProductController {
         }
     }
 
-
+    @GetMapping("/storage/generate-presigned-url")
+    public ResponseEntity<?> generatePresignedUrl(@RequestParam String bucketName,String objectKey){
+        logger.info("Inside generatePresignedUrl Rest API");
+        try{
+            return new ResponseEntity<>(storageService.generatePresignedUrl(bucketName,objectKey,3600),HttpStatus.OK);
+        }catch (Exception e){
+            logger.error("Error while creating a pre-signed URL :: {}",e.getMessage());
+            throw e;
+        }
+    }
 
 
 }
