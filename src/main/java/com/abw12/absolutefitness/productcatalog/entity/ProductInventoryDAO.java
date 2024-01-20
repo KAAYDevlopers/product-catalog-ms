@@ -23,6 +23,10 @@ public class ProductInventoryDAO {
     @Column(name="quantity")
     private Long quantity;
     private String sku;
+    @Column(name="reserved_quantity")
+    private Long reservedQuantity;
+    @Column(name = "reserved_flag")
+    private boolean isReserved;
     @Column(name="created_at")
     private OffsetDateTime createdAt;
     @Column(name="modified_at")
