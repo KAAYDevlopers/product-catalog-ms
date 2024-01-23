@@ -14,9 +14,9 @@ public class ProductVariantDTO {
     @Id
     private String variantId;
     private String productId;
-    private String variantName;
-    private String variantValue;
-    private String variantType;
+    private String variantName; //flavour like coffee,etc.
+    private String variantValue; //weight in kg or lbs
+    private String variantType; //veg or non-veg
     private String imagePath;
     private BigDecimal buyPrice;
     private BigDecimal onSalePrice;
