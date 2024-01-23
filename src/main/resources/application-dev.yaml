@@ -18,6 +18,12 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
+spaces:
+  access_key_id:
+  secret_key:
+  region:
+  baseUrl:
+
 springdoc:
   api-docs:
     path: /v3/productcatalog-docs

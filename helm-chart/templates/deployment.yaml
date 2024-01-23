@@ -30,6 +30,16 @@ spec:
                 secretKeyRef:
                   name: psql-credentials
                   key: password
+            - name: SPACES_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: spaces-credentials
+                  key: access_key_id
+            - name: SPACES_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: spaces-credentials
+                  key: secret_key
           volumeMounts:
             - name: config-volume
               mountPath: {{ .Values.app.configPath }}
