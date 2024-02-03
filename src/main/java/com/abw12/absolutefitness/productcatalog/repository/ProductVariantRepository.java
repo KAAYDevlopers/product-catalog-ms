@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProductVariantRepository  extends JpaRepository<ProductVariantDAO,Long> {
+public interface ProductVariantRepository  extends JpaRepository<ProductVariantDAO,String> {
 
     @Query("SELECT v FROM ProductVariantDAO v WHERE v.productId =:productId")
     Optional<List<ProductVariantDAO>> getVariantsByProductId(@Param("productId") String productId);

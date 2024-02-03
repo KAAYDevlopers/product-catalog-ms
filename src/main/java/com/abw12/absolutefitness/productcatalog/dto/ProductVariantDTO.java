@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -17,7 +18,7 @@ public class ProductVariantDTO {
     private String variantName; //flavour like coffee,etc.
     private String variantValue; //weight in kg or lbs
     private String variantType; //veg or non-veg
-    private String imagePath;
+    private List<String> imageUrlList;
     private BigDecimal buyPrice;
     private BigDecimal onSalePrice;
     private String about;
