@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ProductCategoryRepository extends JpaRepository<ProductCategoryDAO,Long> {
+public interface ProductCategoryRepository extends JpaRepository<ProductCategoryDAO,String> {
 
     @Query("SELECT c FROM ProductCategoryDAO c WHERE c.productCategoryId = :categoryId")
     Optional<ProductCategoryDAO> getProductCategory(String categoryId);

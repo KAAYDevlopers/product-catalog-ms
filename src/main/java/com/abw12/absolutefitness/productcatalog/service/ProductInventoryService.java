@@ -40,6 +40,7 @@ public class ProductInventoryService {
         logger.info("Updated inventory data for variantId :: {} => {}",variantId,productInventoryDAO);
         return inventoryMapper.entityToDto(productInventoryDAO);
     }
+    @Transactional(readOnly = true)
     public InventoryValidationRes variantsValidation(InventoryValidationReq reqData){
         if(StringUtils.isEmpty(reqData.getVariantId())) throw new RuntimeException("Invalid request VariantId cannot be Null/Empty..");
         String variantId = reqData.getVariantId();
@@ -59,6 +60,7 @@ public class ProductInventoryService {
         return response;
     }
 
+    @Transactional
     public Integer deleteInventoryData(List<String> variantIdList){
         logger.info("Deleting inventory data for all variant in variantIdList={}",variantIdList);
         Integer deleteCount = pInventoryPersistenceLayer.deleteVariantInventoryByVariantId(variantIdList);
