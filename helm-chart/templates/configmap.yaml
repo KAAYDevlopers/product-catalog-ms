@@ -22,6 +22,10 @@ data:
             dialect: org.hibernate.dialect.PostgreSQLDialect
         hibernate:
           ddl-auto: update
+      servlet:
+        multipart:
+          max-file-size: 10MB
+          max-request-size: 50MB
     server:
       port: {{ .Values.app.port }}
     spaces:
@@ -29,6 +33,7 @@ data:
       secret_key: {{ .Values.spaces.secret_key }}
       region: {{ .Values.spaces.region }}
       baseUrl: {{ .Values.spaces.baseUrl }}
+      bucketName: {{ .Values.spaces.bucketName }}
     springdoc:
       api-docs:
         path: /v3/productcatalog-docs

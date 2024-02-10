@@ -44,11 +44,26 @@ public class ProductInventoryController {
         }
     }
     @GetMapping("/checkStockStatus")
-    public ResponseEntity<?> getVariantInventoryStatus(@RequestParam Map<String,String> params){
+    public ResponseEntity<?> getVariantInventoryStatus(@RequestParam Map<String,Object> params){
         logger.info("Inside checkStockStatus rest call : {}",params);
         InventoryValidationReq request = InventoryValidationDTOMapper.mapRequestParamsToDTO(params);
         try{
             return new ResponseEntity<>(inventoryService.variantsValidation(request), HttpStatus.OK);
+        }catch (Exception e){
+            logger.error("Exception while validating availability of variants: {} => {}", e.getMessage(),e.getStackTrace());
+            throw e;
+        }
+    }
+
+    @RequestMapping(method = RequestMethod.PATCH,value = "/updateInventoryData")
+    public ResponseEntity<?> patchUpdateInventoryData(@RequestBody Map<String,Object> params){
+        logger.info("Inside patchUpdateInventoryData rest call :: {}",params);
+        try{
+            Map<String, Object> responseMap = inventoryService.patchVariantInventoryData(params);
+            if(responseMap.containsKey("SuccessMsg"))
+                return new ResponseEntity<>(responseMap,HttpStatus.OK);
+            else
+                return new ResponseEntity<>(responseMap,HttpStatus.BAD_REQUEST);
         }catch (Exception e){
             logger.error("Exception while validating availability of variants: {} => {}", e.getMessage(),e.getStackTrace());
             throw e;
