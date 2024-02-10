@@ -144,16 +144,12 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public ProductVariantDTO getVariantDataByVariantId(String variantId){
         logger.info("Fetching variant data with variantId :  {}",variantId);
-        ProductVariantDTO variantDTO = productVariantMapper.entityToDto(persistenceLayer.getProductVariantDataById(variantId));
-        //fetch inventory data for the variant
-        logger.info("Fetching Inventory data with variantId: {}",variantId);
-        ProductInventoryDTO inventoryDTO = inventoryService.getVariantById(variantId);
-        logger.info("Fetched Inventory data with variantId: {} => {}",variantId,inventoryDTO);
-        variantDTO.setInventoryData(inventoryDTO);
+        ProductVariantDAO variantDTO = persistenceLayer.getProductVariantDataById(variantId);
         logger.info("Fetched variant data with variantId : {} => {}",variantId,variantDTO);
-        return variantDTO;
+        return fetchVariantDetails(variantDTO);
     }
     @Transactional
     public ProductDTO insertProduct(ProductDTO productDTO){
@@ -255,12 +251,12 @@ public class ProductService {
         return productList.stream()
                 .peek(productDTO -> {
                     List<ProductVariantDTO> productVariants = persistenceLayer.getVariantsByFilters(productDTO.getProductId(), filtersDTO).stream()
-                            .map(productVariantDAO -> productVariantMapper.entityToDto(productVariantDAO))
+                            .map(this::fetchVariantDetails)
                             .toList();
                     productDTO.setProductVariants(productVariants);
                     productDTO.setProductCategory(productCategoryMapper.entityToDto(persistenceLayer.getCategoryById(filtersDTO.getCategoryId())));
                 })
-                .filter(productDTO -> productDTO.getProductVariants().size() > 0)
+                .filter(productDTO -> !productDTO.getProductVariants().isEmpty())
                 .toList();
     }
 
@@ -322,12 +318,19 @@ public class ProductService {
     private ProductVariantDTO fetchVariantDetails(ProductVariantDAO productVariantDAO) {
         String variantId = productVariantDAO.getVariantId();
         ProductVariantDTO variantDTO = productVariantMapper.entityToDto(productVariantDAO);
+        //fetch inventory data for the current variant
         ProductInventoryDTO inventoryDTO = inventoryService.getVariantById(variantId);
+        Long totalQuantity = inventoryDTO.isReserved()
+                ? (inventoryDTO.getQuantity() - inventoryDTO.getReservedQuantity())
+                : inventoryDTO.getQuantity();
+        inventoryDTO.setQuantity(totalQuantity);
+        variantDTO.setInventoryData(inventoryDTO);
+        //fetch image urls for the current variant
         List<String> variantImageUrlList = imageTableRepository.getImageDataByVariantId(variantDTO.getVariantId())
                 .orElseThrow(() -> new InvalidDataRequestException(String.format("Cannot find Image MetaData for variant by variantId=%s", variantId)))
-                .stream().map(VariantImagesDAO::getImageUrl)
+                .stream()
+                .map(VariantImagesDAO::getImageUrl)
                 .toList();
-        variantDTO.setInventoryData(inventoryDTO);
         variantDTO.setImageUrlList(variantImageUrlList);
         return variantDTO;
     }

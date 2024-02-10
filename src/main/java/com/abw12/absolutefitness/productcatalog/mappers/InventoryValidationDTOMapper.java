@@ -7,17 +7,17 @@ import java.util.Map;
 
 public class InventoryValidationDTOMapper {
 
-    public static InventoryValidationReq mapRequestParamsToDTO(Map<String ,String> params){
+    public static InventoryValidationReq mapRequestParamsToDTO(Map<String ,Object> params){
         InventoryValidationReq inventoryValidationReq = new InventoryValidationReq();
         if(params == null)
             return inventoryValidationReq;
 
         if(params.containsKey("variantId")){
-            inventoryValidationReq.setVariantId(params.get("variantId"));
+            inventoryValidationReq.setVariantId((String)params.get("variantId"));
         }
         if(params.containsKey("quantityRequested")){
             try {
-                inventoryValidationReq.setQuantityRequested(Long.valueOf(params.get("quantityRequested")));
+                inventoryValidationReq.setQuantityRequested(Long.valueOf((String)params.get("quantityRequested")));
             } catch (NumberFormatException e) {
                 throw new InvalidDataRequestException(e.getMessage());
             }

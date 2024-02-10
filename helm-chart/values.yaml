@@ -12,10 +12,11 @@ postgres:
   username: ${DB_USERNAME}
   password: ${DB_PASSWORD}
   host: db-postgresql-blr1-43787-do-user-15428494-0.c.db.ondigitalocean.com
-  port: 25060
+  port: 25061
   db: absolutehealth
 spaces:
   access_key_id: ${SPACES_ACCESS_KEY_ID}
   secret_key: ${SPACES_SECRET_KEY}
   region: blr1
-  baseUrl: https://absolute-health.blr1.digitaloceanspaces.com
+  baseUrl: https://blr1.digitaloceanspaces.com
+  bucketName: absolute-health

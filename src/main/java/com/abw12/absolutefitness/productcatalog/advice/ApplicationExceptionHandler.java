@@ -32,7 +32,7 @@ public class ApplicationExceptionHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<String> handleNotFound(RuntimeException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Failed to process the request...try again later", HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(InvalidDataRequestException.class)

@@ -116,6 +116,35 @@ public class StorageService {
         logger.info("Image stored with variantId={} => {}",variantId,storedImageData.getFileName());
     }
 
+
+    public CompletableFuture<ImageMetaDataDTO> uploadFileAsync(String productId, String variantId, MultipartFile file) {
+        List<Bucket> buckets = s3Client.listBuckets();
+        System.out.println(buckets);
+//        s3Client.createBucket(bucketName);
+        if(!s3Client.doesBucketExistV2(bucketName)){
+            logger.error("Bucket does not exist with name={}",bucketName);
+            throw new RuntimeException("bucket does not exist");
+        }
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                String objectKey = getObjectKey(productId,variantId) + "/" + file.getOriginalFilename();
+                ObjectMetadata metadata = new ObjectMetadata();
+                metadata.setContentLength(file.getSize());
+                metadata.setContentType(file.getContentType());
+                PutObjectRequest uploadImgReq = new PutObjectRequest(bucketName, objectKey, file.getInputStream(), metadata);
+                uploadImgReq.withCannedAcl(CannedAccessControlList.PublicRead); //making the uploaded object public
+                s3Client.putObject(uploadImgReq);
+                String imageUrl = s3Client.getUrl(bucketName, objectKey).toString();
+                return new ImageMetaDataDTO(imageUrl,file.getOriginalFilename(),String.valueOf(file.getSize()),file.getContentType());
+            } catch (IOException e) {
+                logger.error("Error while uploading the image for productId={} , variantId={} => ERROR :: {}",productId,variantId,e.getStackTrace());
+                throw new RuntimeException("Failed to upload file" + e.getMessage(), e);
+            }
+        },fileUploadExecutor);
+    }
+
+
+
 //    public Mono<String> uploadImage(String productId, String variantId, FilePart filePart) {
 //        //'DataBufferUtils.join' it aggregates the incoming data buffers (chunks of the file being uploaded) into a single DataBuffer.
 //        return DataBufferUtils.join(filePart.content())
@@ -145,30 +174,4 @@ public class StorageService {
 //                    return Mono.just("Error occurred while uploading image: " + e.getMessage());
 //                });
 //    }
-
-    public CompletableFuture<ImageMetaDataDTO> uploadFileAsync(String productId, String variantId, MultipartFile file) {
-        List<Bucket> buckets = s3Client.listBuckets();
-        System.out.println(buckets);
-//        s3Client.createBucket(bucketName);
-        if(!s3Client.doesBucketExistV2(bucketName)){
-            logger.error("Bucket does not exist with name={}",bucketName);
-            throw new RuntimeException("bucket does not exist");
-        }
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                String objectKey = getObjectKey(productId,variantId) + "/" + file.getOriginalFilename();
-                ObjectMetadata metadata = new ObjectMetadata();
-                metadata.setContentLength(file.getSize());
-                metadata.setContentType(file.getContentType());
-                PutObjectRequest uploadImgReq = new PutObjectRequest(bucketName, objectKey, file.getInputStream(), metadata);
-                uploadImgReq.withCannedAcl(CannedAccessControlList.PublicRead); //making the uploaded object public
-                s3Client.putObject(uploadImgReq);
-                String imageUrl = s3Client.getUrl(bucketName, objectKey).toString();
-                return new ImageMetaDataDTO(imageUrl,file.getOriginalFilename(),String.valueOf(file.getSize()),file.getContentType());
-            } catch (IOException e) {
-                logger.error("Error while uploading the image for productId={} , variantId={} => ERROR :: {}",productId,variantId,e.getStackTrace());
-                throw new RuntimeException("Failed to upload file" + e.getMessage(), e);
-            }
-        },fileUploadExecutor);
-    }
 }
