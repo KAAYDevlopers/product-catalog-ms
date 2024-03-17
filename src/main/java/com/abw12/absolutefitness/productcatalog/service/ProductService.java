@@ -6,6 +6,7 @@ import com.abw12.absolutefitness.productcatalog.entity.ProductCategoryDAO;
 import com.abw12.absolutefitness.productcatalog.entity.ProductDAO;
 import com.abw12.absolutefitness.productcatalog.entity.ProductVariantDAO;
 import com.abw12.absolutefitness.productcatalog.entity.VariantImagesDAO;
+import com.abw12.absolutefitness.productcatalog.helper.Utils;
 import com.abw12.absolutefitness.productcatalog.mappers.ProductCategoryMapper;
 import com.abw12.absolutefitness.productcatalog.mappers.ProductMapper;
 import com.abw12.absolutefitness.productcatalog.mappers.ProductVariantMapper;
@@ -39,6 +40,9 @@ public class ProductService {
     private ProductInventoryService inventoryService;
     @Autowired
     private ImageTableRepository imageTableRepository;
+
+    @Autowired
+    private Utils utils;
 
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
@@ -161,22 +165,36 @@ public class ProductService {
         ProductCategoryDTO productCategoryDTO = checkIfCategoryExist(productCategory.getCategoryName(), productCategory);
         productEntity.setCategoryId(productCategoryDTO.getProductCategoryId()); //to maintain foreign key in product table for categoryId
 
-        ProductDTO storedProductResponse = productMapper.entityToDto(persistenceLayer.  upsertProductData(productEntity));
+        ProductDTO storedProductResponse = productMapper.entityToDto(persistenceLayer.upsertProductData(productEntity));
         String productId = storedProductResponse.getProductId();
         List<ProductVariantDTO> productVariantsList = productDTO.getProductVariants().stream()
                 .map(variantDTO -> {
                     ProductVariantDAO tempVariantDao = productVariantMapper.DtoToEntity(variantDTO);
                     tempVariantDao.setProductId(productId);
+
+                    //invoke offer-mgmt client to calculate the discounted onSalePrice for the variant based on given offerId
+                    CalcOfferRequest request = utils.prepareCalcOfferRequest(productCategoryDTO,productDTO,variantDTO);
+                    CalcOfferResponse calcOfferResponse = utils.calcOfferApi(request, variantDTO.getVariantName());
+                    //set the onSalePrice only if any offer is applied and discount is provide else keep the onSalePrice = null
+                    if(calcOfferResponse.getStatusCode().equalsIgnoreCase(HttpStatus.OK.getReasonPhrase()))
+                        tempVariantDao.setOnSalePrice(calcOfferResponse.getOnSalePrice());
+
                     //store variant info in db
                     ProductVariantDAO storedVariantData = persistenceLayer.upsertVariant(tempVariantDao);
                     ProductVariantDTO response = productVariantMapper.entityToDto(storedVariantData);
                     logger.info("variant data with productId:{} stored in db : {}" ,productId,response);
+
+                    //map the variantId to the offerId calling offer-mgmt-ms api(only if the discount was calculated for the variant)
+                    if(calcOfferResponse.getStatusCode().equalsIgnoreCase(HttpStatus.OK.getReasonPhrase()))
+                        utils.mapVariantIdToOffer(response.getVariantId(),variantDTO.getOfferId());
+
                     //taking variantId after storing the variant in db
                     variantDTO.getInventoryData().setVariantId(response.getVariantId());
                     //save inventory data for each variant in the list
                     ProductInventoryDTO storedInventoryData = inventoryService.updateVariantInventoryData(variantDTO.getInventoryData());
                     logger.info("inventory data stored with productId: {} => {}",productId,storedInventoryData);
                     response.setInventoryData(storedInventoryData);
+
                     return response;
                 })
                 .toList();

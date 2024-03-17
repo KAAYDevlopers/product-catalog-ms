@@ -69,11 +69,12 @@ public class StorageController {
     public ResponseEntity<?> uploadImages(@PathVariable String productId,
                                           @PathVariable String variantId,
                                           @RequestParam("images") MultipartFile[] images) {
-
+        logger.info("Inside uploadImages Rest API :: productId={} :: variantId={} ",productId,variantId);
         for (MultipartFile image : images) {
             CompletableFuture<ImageMetaDataDTO> uploadFuture = storageService.uploadFileAsync(productId,variantId, image);
             uploadFuture.thenAccept(imageMetaData -> {
                 // Process the URL, e.g., save to DB (this executed synchronously )
+                logger.info("Images are uploaded successfully to spaces object store, storing metadata in DB");
                 storageService.saveImageMetaDataInDB(productId,variantId,imageMetaData);
             }).exceptionally(e -> {
                 // Log and handle the exception

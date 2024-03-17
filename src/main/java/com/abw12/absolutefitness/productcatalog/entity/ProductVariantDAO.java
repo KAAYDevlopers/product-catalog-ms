@@ -41,6 +41,8 @@ public class ProductVariantDAO {
     private BigDecimal buyPrice;
     @Column(name="on_sale_price")
     private BigDecimal onSalePrice;
+    @Column(name = "offer_id")
+    private String offerId;
     @Column(name="mfd_date")
     private OffsetDateTime mfdDate;
     @Column(name="expiry_date")
