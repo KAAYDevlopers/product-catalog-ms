@@ -21,6 +21,7 @@ public class ProductVariantDTO {
     private List<String> imageUrlList;
     private BigDecimal buyPrice;
     private BigDecimal onSalePrice;
+    private String offerId;
     private String about;
     private String benefits;
     private String nutritionFacts;

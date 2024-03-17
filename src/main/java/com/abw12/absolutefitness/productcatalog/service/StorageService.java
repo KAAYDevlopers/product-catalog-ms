@@ -118,9 +118,6 @@ public class StorageService {
 
 
     public CompletableFuture<ImageMetaDataDTO> uploadFileAsync(String productId, String variantId, MultipartFile file) {
-        List<Bucket> buckets = s3Client.listBuckets();
-        System.out.println(buckets);
-//        s3Client.createBucket(bucketName);
         if(!s3Client.doesBucketExistV2(bucketName)){
             logger.error("Bucket does not exist with name={}",bucketName);
             throw new RuntimeException("bucket does not exist");
@@ -133,8 +130,10 @@ public class StorageService {
                 metadata.setContentType(file.getContentType());
                 PutObjectRequest uploadImgReq = new PutObjectRequest(bucketName, objectKey, file.getInputStream(), metadata);
                 uploadImgReq.withCannedAcl(CannedAccessControlList.PublicRead); //making the uploaded object public
+                logger.info("Object key to be uploaded :: {}",objectKey);
                 s3Client.putObject(uploadImgReq);
                 String imageUrl = s3Client.getUrl(bucketName, objectKey).toString();
+                logger.info("Image URL ");
                 return new ImageMetaDataDTO(imageUrl,file.getOriginalFilename(),String.valueOf(file.getSize()),file.getContentType());
             } catch (IOException e) {
                 logger.error("Error while uploading the image for productId={} , variantId={} => ERROR :: {}",productId,variantId,e.getStackTrace());
