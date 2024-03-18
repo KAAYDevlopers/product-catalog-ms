@@ -31,8 +31,8 @@ public class Utils {
 
     public CalcOfferRequest prepareCalcOfferRequest(ProductCategoryDTO productCategoryDTO, ProductDTO productDTO, ProductVariantDTO variantDTO) {
             CalcOfferRequest request =new CalcOfferRequest();
-            if(!StringUtils.isEmpty(variantDTO.getOfferId()))
-                request.setOfferId(variantDTO.getOfferId());
+            if(!StringUtils.isEmpty(variantDTO.getOffer().getOfferId()))
+                request.setOfferId(variantDTO.getOffer().getOfferId());
 
             if(!StringUtils.isEmpty(variantDTO.getVariantName()))
                 request.setVariantName(variantDTO.getVariantName());
@@ -71,6 +71,18 @@ public class Utils {
             logger.info("Response: offer-mgmt-ms API to map variantId to offer is successful => {}",response.getBody());
         }else {
             throw new RuntimeException(String.format("Exception while calling offer-mgmt-ms API to map variantId to offer :: %s => %s",
+                    response.getStatusCode(),response.getBody()));
+        }
+    }
+
+    public OfferDTO fetchOfferDetails(String offerId){
+        logger.info("Retrieve Offer Details calling offer-mgmt-ms getOfferDetails API with offerId={}",offerId);
+        ResponseEntity<Map<String, Object>> response = offerMgmtClient.getOfferDetails(offerId);
+        if(response.getStatusCode().is2xxSuccessful() && response.hasBody()){
+            logger.info("Response: offer-mgmt-ms getOfferDetails API with offerId={} => {}",offerId,response.getBody());
+            return objectMapper.convertValue(response.getBody(), OfferDTO.class);
+        }else {
+            throw new RuntimeException(String.format("Exception while calling offer-mgmt-ms getOfferDetails API with offerId=%s :: %s => %s",offerId,
                     response.getStatusCode(),response.getBody()));
         }
     }

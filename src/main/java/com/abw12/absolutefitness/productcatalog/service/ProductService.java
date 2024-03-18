@@ -12,6 +12,7 @@ import com.abw12.absolutefitness.productcatalog.mappers.ProductMapper;
 import com.abw12.absolutefitness.productcatalog.mappers.ProductVariantMapper;
 import com.abw12.absolutefitness.productcatalog.persistence.ProductPersistenceLayer;
 import com.abw12.absolutefitness.productcatalog.repository.ImageTableRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,9 +176,12 @@ public class ProductService {
                     //invoke offer-mgmt client to calculate the discounted onSalePrice for the variant based on given offerId
                     CalcOfferRequest request = utils.prepareCalcOfferRequest(productCategoryDTO,productDTO,variantDTO);
                     CalcOfferResponse calcOfferResponse = utils.calcOfferApi(request, variantDTO.getVariantName());
-                    //set the onSalePrice only if any offer is applied and discount is provide else keep the onSalePrice = null
-                    if(calcOfferResponse.getStatusCode().equalsIgnoreCase(HttpStatus.OK.getReasonPhrase()))
+                    //set the offerId & onSalePrice only if any offer is applied and discount is provide else keep the onSalePrice = null
+                    if(calcOfferResponse.getStatusCode().equalsIgnoreCase(HttpStatus.OK.getReasonPhrase())){
+                        tempVariantDao.setOfferId(variantDTO.getOffer().getOfferId());
                         tempVariantDao.setOnSalePrice(calcOfferResponse.getOnSalePrice());
+                    }
+
 
                     //store variant info in db
                     ProductVariantDAO storedVariantData = persistenceLayer.upsertVariant(tempVariantDao);
@@ -186,7 +190,7 @@ public class ProductService {
 
                     //map the variantId to the offerId calling offer-mgmt-ms api(only if the discount was calculated for the variant)
                     if(calcOfferResponse.getStatusCode().equalsIgnoreCase(HttpStatus.OK.getReasonPhrase()))
-                        utils.mapVariantIdToOffer(response.getVariantId(),variantDTO.getOfferId());
+                        utils.mapVariantIdToOffer(response.getVariantId(),variantDTO.getOffer().getOfferId());
 
                     //taking variantId after storing the variant in db
                     variantDTO.getInventoryData().setVariantId(response.getVariantId());
@@ -335,7 +339,15 @@ public class ProductService {
 
     private ProductVariantDTO fetchVariantDetails(ProductVariantDAO productVariantDAO) {
         String variantId = productVariantDAO.getVariantId();
+        String offerId = productVariantDAO.getOfferId();
+
         ProductVariantDTO variantDTO = productVariantMapper.entityToDto(productVariantDAO);
+        //If offerId is present for any variant then retrieve offer details by calling offer-mgmt-ms
+        if(!StringUtils.isEmpty(offerId)){
+            OfferDTO offerData = utils.fetchOfferDetails(offerId);
+            variantDTO.setOffer(offerData);
+        }
+
         //fetch inventory data for the current variant
         ProductInventoryDTO inventoryDTO = inventoryService.getVariantById(variantId);
         Long totalQuantity = inventoryDTO.isReserved()
