@@ -26,6 +26,12 @@ data:
         multipart:
           max-file-size: 10MB
           max-request-size: 50MB
+      cloud:
+        openfeign:
+          client:
+            config:
+              offermgmt-offer-controller:
+                url: http://offer-mgmt-ms.absolutehealth.svc.cluster.local:80/offer/v1
     server:
       port: {{ .Values.app.port }}
     spaces:
