@@ -34,7 +34,7 @@ public class ProductController {
         try{
             return new ResponseEntity<>(productService.ListProduct(PageRequest.of(page, size)),HttpStatus.OK);
         }catch (Exception e){
-            logger.error("Exception while fetching product by Id : {}",e.getMessage());
+            logger.error("Exception while listing the products : {}",e.getMessage());
             throw e;
         }
     }
