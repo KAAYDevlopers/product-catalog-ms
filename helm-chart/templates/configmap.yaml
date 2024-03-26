@@ -31,7 +31,7 @@ data:
           client:
             config:
               offermgmt-offer-controller:
-                url: http://offer-mgmt-ms.absolutehealth.svc.cluster.local:80/offer/v1
+                url: http://offer-management-ms.absolutehealth.svc.cluster.local:80/offer/v1
     server:
       port: {{ .Values.app.port }}
     spaces:
