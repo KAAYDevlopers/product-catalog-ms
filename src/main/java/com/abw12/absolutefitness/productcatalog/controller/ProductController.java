@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -102,7 +103,7 @@ public class ProductController {
         try {
             return new ResponseEntity<>(productService.insertProduct(productDTO),HttpStatus.CREATED);
         } catch (Exception e) {
-            logger.error("Exception while inserting the product with productId:{} :: Error Message= {}",productDTO.getProductId(),e.getMessage());
+            logger.error("Exception while inserting the product :: Error Message= {} => {}",e.getMessage(), Arrays.stream(e.getStackTrace()).findFirst());
             throw e;
         }
     }
@@ -113,7 +114,8 @@ public class ProductController {
         try {
             return new ResponseEntity<>(productService.updateProduct(productDTO),HttpStatus.OK);
         } catch (Exception e) {
-            logger.error("Exception while updating the product with productId:{} :: Error Message= {}",productDTO.getProductId(),e.getMessage());
+            logger.error("Exception while updating the product with productId:{} :: Error Message= {} => {}",productDTO.getProductId(),e.getMessage(),
+                    Arrays.stream(e.getStackTrace()).findFirst());
             throw e;
         }
     }
@@ -124,7 +126,7 @@ public class ProductController {
         try {
             return new ResponseEntity<>(productService.upsertVariantByProductId(productId,variantDTOList),HttpStatus.CREATED);
         } catch (Exception e) {
-            logger.error("Exception while inserting/updating the variant list with productId:{} :: Error Message= {}",productId,e.getMessage());
+            logger.error("Exception while inserting/updating the variant list with productId:{} :: Error Message= {} => {}",productId,e.getMessage(),e.getStackTrace());
             throw e;
         }
     }

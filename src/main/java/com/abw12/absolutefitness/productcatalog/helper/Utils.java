@@ -31,7 +31,7 @@ public class Utils {
 
     public CalcOfferRequest prepareCalcOfferRequest(ProductCategoryDTO productCategoryDTO, ProductDTO productDTO, ProductVariantDTO variantDTO) {
             CalcOfferRequest request =new CalcOfferRequest();
-            if(!StringUtils.isEmpty(variantDTO.getOffer().getOfferId()))
+            if(variantDTO.getOffer()!=null && !StringUtils.isEmpty(variantDTO.getOffer().getOfferId()))
                 request.setOfferId(variantDTO.getOffer().getOfferId());
 
             if(!StringUtils.isEmpty(variantDTO.getVariantName()))
