@@ -173,15 +173,20 @@ public class ProductService {
                     ProductVariantDAO tempVariantDao = productVariantMapper.DtoToEntity(variantDTO);
                     tempVariantDao.setProductId(productId);
 
-                    //invoke offer-mgmt client to calculate the discounted onSalePrice for the variant based on given offerId
-                    CalcOfferRequest request = utils.prepareCalcOfferRequest(productCategoryDTO,productDTO,variantDTO);
-                    CalcOfferResponse calcOfferResponse = utils.calcOfferApi(request, variantDTO.getVariantName());
-                    //set the offerId & onSalePrice only if any offer is applied and discount is provide else keep the onSalePrice = null
-                    if(calcOfferResponse.getStatusCode().equalsIgnoreCase(HttpStatus.OK.getReasonPhrase())){
-                        tempVariantDao.setOfferId(variantDTO.getOffer().getOfferId());
-                        tempVariantDao.setOnSalePrice(calcOfferResponse.getOnSalePrice());
+                    CalcOfferResponse calcOfferResponse = null;
+                    if(variantDTO.getOffer()!=null){
+                        //invoke offer-mgmt client to calculate the discounted onSalePrice for the variant based on given offerId
+                        CalcOfferRequest request = utils.prepareCalcOfferRequest(productCategoryDTO,productDTO,variantDTO);
+                         calcOfferResponse = utils.calcOfferApi(request, variantDTO.getVariantName());
+                        //set the offerId & onSalePrice only if any offer is applied and discount is provide else keep the onSalePrice = null
+                        if(calcOfferResponse!=null && calcOfferResponse.getStatusCode().equalsIgnoreCase(HttpStatus.OK.getReasonPhrase())){
+                            tempVariantDao.setOfferId(variantDTO.getOffer().getOfferId());
+                            tempVariantDao.setOnSalePrice(calcOfferResponse.getOnSalePrice());
+                        }
+                    }else {
+                        logger.info("Variant does not have any offer data not calling offer-mgmt-ms API to calculate discount ( onSalePrice ) :: variantName={} , variantValue={}"
+                                , variantDTO.getVariantName(),variantDTO.getVariantValue());
                     }
-
 
                     //store variant info in db
                     ProductVariantDAO storedVariantData = persistenceLayer.upsertVariant(tempVariantDao);
@@ -189,7 +194,7 @@ public class ProductService {
                     logger.info("variant data with productId:{} stored in db : {}" ,productId,response);
 
                     //map the variantId to the offerId calling offer-mgmt-ms api(only if the discount was calculated for the variant)
-                    if(calcOfferResponse.getStatusCode().equalsIgnoreCase(HttpStatus.OK.getReasonPhrase()))
+                    if(calcOfferResponse!=null && calcOfferResponse.getStatusCode().equalsIgnoreCase(HttpStatus.OK.getReasonPhrase()))
                         utils.mapVariantIdToOffer(response.getVariantId(),variantDTO.getOffer().getOfferId());
 
                     //taking variantId after storing the variant in db
